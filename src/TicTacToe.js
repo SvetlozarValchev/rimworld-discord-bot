@@ -128,6 +128,10 @@ class TicTacToe {
     }
   }
 
+  /**
+   * @param {string} name
+   * @returns {boolean}
+   */
   static hasInstance(name) {
     let has = false;
 
@@ -156,6 +160,9 @@ class TicTacToe {
     return inst;
   }
 
+  /**
+   * @param {string} playerOrOpponentName
+   */
   static deleteInstance(playerOrOpponentName) {
     instances.forEach((instance, idx) => {
       if(instance.player === playerOrOpponentName || instance.opponent === playerOrOpponentName) {
@@ -338,10 +345,19 @@ class TicTacToe {
     return instance.beforeDraw(manager, message, args);
   }
 
+  /**
+   * @param {Message} message
+   * @returns {boolean}
+   */
   isPlayer(message) {
     return this.player === Commands.getNickname(message);
   }
 
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @returns {number}
+   */
   getTile(x, y) {
     return this.map[y][x];
   }
