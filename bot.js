@@ -8,7 +8,6 @@ const TicTacToe = require('./src/TicTacToe');
 // Initialize
 const client = new Discord.Client();
 const manager = new Manager(db);
-const ttt = new TicTacToe();
 
 client.on('ready', (evt) => {
   console.info('Connected');
@@ -18,10 +17,10 @@ client.on('ready', (evt) => {
 
 client.on("message", /** @type {Message} */ (message) => {
   if (message.author.bot) {
-    // return;
+    return;
   } // Ignore bots.
   if (message.channel.name !== "my-secret-dev-channel") {
-    return;
+    // return;
   } // Only certain channel
 
   if (message.content.substring(0, 1) !== '!') {
@@ -38,14 +37,14 @@ client.on("message", /** @type {Message} */ (message) => {
       message.channel.send('Pong!');
       break;
     }
-    case 'say': {
-      if(message.author.username === 'cbethax') {
-        return message.delete().then(() => {
-          return message.channel.send(args.join(" "))
-        });
-      }
-      break;
-    }
+    // case 'say': {
+    //   if(message.author.username === 'cbethax') {
+    //     return message.delete().then(() => {
+    //       return message.channel.send(args.join(" "))
+    //     });
+    //   }
+    //   break;
+    // }
     case 'stats': {
       return Commands.showStats(manager, message, args);
     }

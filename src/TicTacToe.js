@@ -6,6 +6,7 @@ const Commands = require('./Commands');
 
 const Image = Canvas.Image;
 const IMG_PATH = path.join(__dirname, '..', 'assets');
+const MentionRegex = new RegExp(/\<@!?([0-9]+)\>/);
 
 const images = {
   bg: {
@@ -20,6 +21,26 @@ const images = {
 
   cross: {
     filename: 'tictactoe_cross.png',
+    image: null
+  },
+
+  line_horizontal: {
+    filename: 'tictactoe_line_horizontal.png',
+    image: null
+  },
+
+  line_vertical: {
+    filename: 'tictactoe_line_vertical.png',
+    image: null
+  },
+
+  line_diagonal_left: {
+    filename: 'tictactoe_line_diagonal_left.png',
+    image: null
+  },
+
+  line_diagonal_right: {
+    filename: 'tictactoe_line_diagonal_right.png',
     image: null
   }
 };
@@ -59,7 +80,7 @@ class TicTacToe {
     /**
      * @type {boolean}
      */
-    this.playerTurn = true;
+    this.playerTurn = false;
 
     /**
      * @type {Array.<Array.<number>>}
@@ -71,14 +92,9 @@ class TicTacToe {
     ];
 
     /**
-     * @type {boolean}
+     * @type {number}
      */
-    this.playerWon = false;
-
-    /**
-     * @type {boolean}
-     */
-    this.ended = false;
+    this.winType = TicTacToe.winType.none;
   }
 
   static preload() {
@@ -95,6 +111,21 @@ class TicTacToe {
       circle: 1,
       cross: -1
     };
+  }
+
+  static get winType() {
+    return {
+      none: 0,
+      horizontalTop: 1,
+      horizontalMiddle: 2,
+      horizontalBottom: 3,
+      verticalLeft: 4,
+      verticalMiddle: 5,
+      verticalRight: 6,
+      diagonalLeft: 7,
+      diagonalRight: 8,
+      draw: 9
+    }
   }
 
   static hasInstance(name) {
@@ -125,6 +156,14 @@ class TicTacToe {
     return inst;
   }
 
+  static deleteInstance(playerOrOpponentName) {
+    instances.forEach((instance, idx) => {
+      if(instance.player === playerOrOpponentName || instance.opponent === playerOrOpponentName) {
+        delete instances[idx];
+      }
+    });
+  }
+
   /**
    * @param {Manager} manager
    * @param {Message} message
@@ -153,11 +192,7 @@ class TicTacToe {
       return Commands.sendError(message, 'You don\'t have an active game; Type `!ttt help`');
     }
 
-    instances.forEach((instance, idx) => {
-      if(instance.player === name || instance.opponent === name) {
-        delete instances[idx];
-      }
-    });
+    TicTacToe.deleteInstance(name);
 
     return Commands.sendSuccess(message, 'Your game was stopped.');
   }
@@ -169,10 +204,31 @@ class TicTacToe {
    */
   static play(manager, message, args = []) {
     const player = Commands.getNickname(message);
-    const opponent = args.join(" ");
+    let opponent = args.join(" ");
+
+    if(!opponent) {
+      return Commands.sendError(message, 'You must type your opponent.');
+    }
+
+    if(MentionRegex.test(opponent)) {
+      const id = opponent.match(MentionRegex)[1];
+      const member = message.channel.members.find('id', id);
+
+      opponent = member.nickname || member.user && member.user.username;
+    }
+
+    if(opponent === Commands.getNickname(message)) {
+      return Commands.sendError(message, 'You can\'t challenge yourself.');
+    }
 
     if(TicTacToe.hasInstance(player) || TicTacToe.hasInstance(opponent)) {
-      return Commands.sendError(message, 'You already have an active game; Type `!ttt stop` to stop it.');
+      const instance = TicTacToe.getInstance(Commands.getNickname(message));
+
+      if(instance.winType > 0) {
+        TicTacToe.deleteInstance(player);
+      } else {
+        return Commands.sendError(message, 'You already have an active game; Type `!ttt stop` to stop it.');
+      }
     }
 
     const instance = new TicTacToe(player, opponent);
@@ -182,6 +238,15 @@ class TicTacToe {
     return Commands.sendSuccess(message, 'Game started. Set a position with `!ttt set [positions]`').then(() => {
       TicTacToe.show(manager, message, args);
     });
+  }
+
+  /**
+   * @param {Manager} manager
+   * @param {Message} message
+   * @param {Array} args
+   */
+  static playSuccess(manager, message, args = []) {
+
   }
 
   /**
@@ -214,6 +279,10 @@ class TicTacToe {
     const tileType = isPlayer ? TicTacToe.tile.cross : TicTacToe.tile.circle;
     const [position1, position2] = args;
 
+    if(instance.winType > 0) {
+      return Commands.sendError(message, 'Game already ended');
+    }
+
     if((isPlayer && !instance.playerTurn) || (!isPlayer && instance.playerTurn)) {
       return Commands.sendError(message, 'It\'s not your turn');
     }
@@ -244,13 +313,21 @@ class TicTacToe {
       }
     }
 
-    instance.toggleTurn();
+    instance.checkWin();
+
+    if(instance.winType === TicTacToe.winType.none) {
+      instance.toggleTurn();
+    }
 
     return instance.beforeDraw(manager, message, args);
   }
 
   isPlayer(message) {
     return this.player === Commands.getNickname(message);
+  }
+
+  getTile(x, y) {
+    return this.map[y][x];
   }
 
   /**
@@ -279,6 +356,74 @@ class TicTacToe {
     }
   }
 
+  checkWin() {
+    let tile1;
+    let tile2;
+    let tile3;
+
+    // top horizontal
+    [tile1, tile2, tile3] = [this.getTile(0, 0), this.getTile(1, 0), this.getTile(2, 0)];
+    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+      this.winType = TicTacToe.winType.horizontalTop;
+    }
+
+    // middle horizontal
+    [tile1, tile2, tile3] = [this.getTile(0, 1), this.getTile(1, 1), this.getTile(2, 1)];
+    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+      this.winType = TicTacToe.winType.horizontalMiddle;
+    }
+
+    // bottom horizontal
+    [tile1, tile2, tile3] = [this.getTile(0, 2), this.getTile(1, 2), this.getTile(2, 2)];
+    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+      this.winType = TicTacToe.winType.horizontalBottom;
+    }
+
+    // left vertical
+    [tile1, tile2, tile3] = [this.getTile(0, 0), this.getTile(0, 1), this.getTile(0, 2)];
+    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+      this.winType = TicTacToe.winType.verticalLeft;
+    }
+
+    // middle vertical
+    [tile1, tile2, tile3] = [this.getTile(1, 0), this.getTile(1, 1), this.getTile(1, 2)];
+    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+      this.winType = TicTacToe.winType.verticalMiddle;
+    }
+
+    // right vertical
+    [tile1, tile2, tile3] = [this.getTile(2, 0), this.getTile(2, 1), this.getTile(2, 2)];
+    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+      this.winType = TicTacToe.winType.verticalRight;
+    }
+
+    // diagonal left
+    [tile1, tile2, tile3] = [this.getTile(0, 0), this.getTile(1, 1), this.getTile(2, 2)];
+    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+      this.winType = TicTacToe.winType.diagonalLeft;
+    }
+
+    // diagonal right
+    [tile1, tile2, tile3] = [this.getTile(2, 0), this.getTile(1, 1), this.getTile(0, 2)];
+    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+      this.winType = TicTacToe.winType.diagonalRight;
+    }
+
+    let settedTiles = 0;
+
+    this.map.forEach((row, y) => {
+      row.forEach((tile, x) => {
+        if(tile !== TicTacToe.tile.none) {
+          settedTiles++;
+        }
+      });
+    });
+
+    if(settedTiles === 9) {
+      this.winType = TicTacToe.winType.draw;
+    }
+  }
+
   /**
    * @param {Manager} manager
    * @param {Message} message
@@ -286,6 +431,12 @@ class TicTacToe {
    */
   draw(manager, message, args) {
     let img;
+    let title;
+    let winLine = {
+      image: null,
+      x: 0,
+      y: 0
+    };
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -307,7 +458,35 @@ class TicTacToe {
       });
     });
 
-    return message.channel.send(`${this.player} (X) vs. ${this.opponent} (O)`, new Discord.Attachment(this.canvas.toBuffer())).then((prevMsg) => {
+    switch(this.winType) {
+      case TicTacToe.winType.horizontalTop: winLine.image = 'line_horizontal'; winLine.x = 0; winLine.y = 0; break;
+      case TicTacToe.winType.horizontalMiddle: winLine.image = 'line_horizontal'; winLine.x = 0; winLine.y = 50; break;
+      case TicTacToe.winType.horizontalBottom: winLine.image = 'line_horizontal'; winLine.x = 0; winLine.y = 100; break;
+      case TicTacToe.winType.verticalLeft: winLine.image = 'line_vertical'; winLine.x = 0; winLine.y = 0; break;
+      case TicTacToe.winType.verticalMiddle: winLine.image = 'line_vertical'; winLine.x = 50; winLine.y = 0; break;
+      case TicTacToe.winType.verticalRight: winLine.image = 'line_vertical'; winLine.x = 100; winLine.y = 0; break;
+      case TicTacToe.winType.diagonalLeft: winLine.image = 'line_diagonal_left'; winLine.x = 0; winLine.y = 0; break;
+      case TicTacToe.winType.diagonalRight: winLine.image = 'line_diagonal_right'; winLine.x = 0; winLine.y = 0; break;
+      default: break;
+    }
+
+    if(winLine.image) {
+      this.ctx.drawImage(images[winLine.image].image, winLine.x, winLine.y, images[winLine.image].image.width, images[winLine.image].image.height);
+
+      if(this.playerTurn) {
+        title = `${this.player} Won!`;
+      } else {
+        title = `${this.opponent} Won!`;
+      }
+    } else {
+      if(this.winType === TicTacToe.winType.draw) {
+        title = 'Draw!';
+      } else {
+        title = `**X** \`${this.player}\` vs. **O** \`${this.opponent}\``;
+      }
+    }
+
+    return message.channel.send(title, new Discord.Attachment(this.canvas.toBuffer())).then((prevMsg) => {
       this.previousMessage = prevMsg;
     });
   }
