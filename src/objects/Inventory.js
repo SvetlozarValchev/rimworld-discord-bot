@@ -3,6 +3,10 @@ const Item = require('./Item');
 class Inventory {
   constructor() {
     /**
+     * @type {number}
+     */
+    this.size = 0;
+    /**
      * @type {Array.<Item>}
      */
     this.items = {};

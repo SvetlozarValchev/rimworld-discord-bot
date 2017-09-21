@@ -78,6 +78,10 @@ class Commands {
     return Commands.sendEmbed(message, title, 'Not Available. Type \`!join\` to enter the game.');
   }
 
+  /**
+   * @param {Message} message
+   * @returns {string}
+   */
   static getNickname(message) {
     if (message.member && message.member.nickname) {
       return message.member.nickname;

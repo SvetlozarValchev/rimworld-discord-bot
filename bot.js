@@ -3,12 +3,12 @@ const auth = require('./auth.json');
 const db = require('sqlite');
 const Manager = require('./src/Manager');
 const Commands = require('./src/Commands');
+const TicTacToe = require('./src/TicTacToe');
 
-
-const manager = new Manager(db);
-
-// Initialize Discord Bot
+// Initialize
 const client = new Discord.Client();
+const manager = new Manager(db);
+const ttt = new TicTacToe();
 
 client.on('ready', (evt) => {
   console.info('Connected');
@@ -16,12 +16,12 @@ client.on('ready', (evt) => {
   console.info(client.user.username + ' - (' + client.user.id + ')');
 });
 
-client.on("message", (message) => {
+client.on("message", /** @type {Message} */ (message) => {
   if (message.author.bot) {
-    return;
+    // return;
   } // Ignore bots.
   if (message.channel.name !== "my-secret-dev-channel") {
-    // return;
+    return;
   } // Only certain channel
 
   if (message.content.substring(0, 1) !== '!') {
@@ -36,6 +36,14 @@ client.on("message", (message) => {
   switch (cmd) {
     case 'ping': {
       message.channel.send('Pong!');
+      break;
+    }
+    case 'say': {
+      if(message.author.username === 'cbethax') {
+        return message.delete().then(() => {
+          return message.channel.send(args.join(" "))
+        });
+      }
       break;
     }
     case 'stats': {
@@ -65,6 +73,29 @@ client.on("message", (message) => {
     case 'abandon': {
       return Commands.abandonSettlement(manager, message, args);
     }
+    case 'ttt': {
+      if(args[0] === 'help') {
+        args = args.splice(1);
+
+        return TicTacToe.help(manager, message, args);
+      } else if(args[0] === 'play') {
+        args = args.splice(1);
+
+        return TicTacToe.play(manager, message, args);
+      } else if(args[0] === 'show') {
+        args = args.splice(1);
+
+        return TicTacToe.show(manager, message, args);
+      } else if(args[0] === 'set') {
+        args = args.splice(1);
+
+        return TicTacToe.set(manager, message, args);
+      } else if(args[0] === 'stop') {
+        args = args.splice(1);
+
+        return TicTacToe.stop(manager, message, args);
+      }
+    }
   }
 });
 
@@ -75,6 +106,8 @@ Promise.resolve()
   .then(() => load());
 
 function init() {
+  TicTacToe.preload();
+
   return Promise.resolve()
     .then(() => db.run("CREATE TABLE IF NOT EXISTS colonists (userId TEXT, username TEXT, data TEXT)"))
     .catch(err => console.error(err.stack))

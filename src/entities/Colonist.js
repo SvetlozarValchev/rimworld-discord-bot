@@ -37,7 +37,19 @@ class Colonist {
       mood: 100,
     };
 
-    // this.stats = new ColonistStats();
+    this.stats = {
+      combat: 0,
+      social: 0,
+      medicine: 0,
+      cooking: 0,
+      construction: 0,
+      growing: 0,
+      mining: 0,
+      artistic: 0,
+      crafting: 0,
+      research: 0,
+      carryCapacity: 0
+    };
 
     /**
      * @type {Inventory}
@@ -63,11 +75,8 @@ class Colonist {
       $data: JSON.stringify({
         nickname: this.nickname,
         settlement: this.settlement,
-        needs: {
-          health: this.needs.health,
-          hunger: this.needs.hunger,
-          mood: this.needs.mood,
-        },
+        needs: this.needs,
+        stats: this.stats,
         inventory: this.inventory.get()
       })
     };
@@ -87,6 +96,7 @@ class Colonist {
     this.nickname = data.nickname;
     this.settlement = data.settlement;
     this.needs = data.needs;
+    this.stats = data.stats;
     this.inventory.set(data.inventory);
   }
 }

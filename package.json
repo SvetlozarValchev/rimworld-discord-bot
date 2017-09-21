@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/SvetlozarValchev/rimworld-discord-bot#readme",
   "dependencies": {
+    "canvas": "^1.6.7",
     "discord.js": "^11.2.1",
     "sqlite": "^2.8.0"
   }
