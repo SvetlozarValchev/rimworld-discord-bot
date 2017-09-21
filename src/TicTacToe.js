@@ -304,6 +304,7 @@ class TicTacToe {
         case 'top': yPos = 0; break;
         case 'middle': yPos = 1; break;
         case 'bottom': yPos = 2; break;
+        default: return;
       }
 
       switch(position2) {

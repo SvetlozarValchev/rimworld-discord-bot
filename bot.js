@@ -17,7 +17,7 @@ client.on('ready', (evt) => {
 
 client.on("message", /** @type {Message} */ (message) => {
   if (message.author.bot) {
-    return;
+    // return;
   } // Ignore bots.
   if (message.channel.name !== "my-secret-dev-channel") {
     // return;
@@ -37,14 +37,14 @@ client.on("message", /** @type {Message} */ (message) => {
       message.channel.send('Pong!');
       break;
     }
-    // case 'say': {
-    //   if(message.author.username === 'cbethax') {
-    //     return message.delete().then(() => {
-    //       return message.channel.send(args.join(" "))
-    //     });
-    //   }
-    //   break;
-    // }
+    case 'say': {
+      if(message.author.username === 'cbethax') {
+        return message.delete().then(() => {
+          return message.channel.send(args.join(" "))
+        });
+      }
+      break;
+    }
     case 'stats': {
       return Commands.showStats(manager, message, args);
     }
