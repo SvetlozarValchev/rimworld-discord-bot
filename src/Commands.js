@@ -132,7 +132,7 @@ class Commands {
    * @param {Array} args
    */
   static showColonists(manager, message, args = []) {
-    const colonists = manager.getColonists();
+    const colonists = manager.getColonists(args);
     const text = [];
 
     Object.keys(colonists).forEach((key) => {
