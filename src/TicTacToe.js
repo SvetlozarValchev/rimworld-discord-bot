@@ -482,7 +482,11 @@ class TicTacToe {
       if(this.winType === TicTacToe.winType.draw) {
         title = 'Draw!';
       } else {
-        title = `**X** \`${this.player}\` vs. **O** \`${this.opponent}\``;
+        if(this.playerTurn) {
+          title = `**X** \`>${this.player}<\` vs. **O** \`${this.opponent}\``;
+        } else {
+          title = `**X** \`${this.player}\` vs. **O** \`>${this.opponent}<\``;
+        }
       }
     }
 

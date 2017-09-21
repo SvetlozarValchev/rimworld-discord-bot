@@ -94,6 +94,11 @@ client.on("message", /** @type {Message} */ (message) => {
 
         return TicTacToe.stop(manager, message, args);
       }
+
+      break;
+    }
+    case 'time': {
+
     }
   }
 });
