@@ -24,7 +24,7 @@ class Colonist {
     this.nickname = nickname;
 
     /**
-     * @type {string}
+     * @type {string|null}
      */
     this.settlement = null;
 
@@ -98,6 +98,14 @@ class Colonist {
     this.needs = data.needs;
     this.stats = data.stats;
     this.inventory.set(data.inventory);
+  }
+
+  getNeeds() {
+    return {
+      'Health': this.needs.health,
+      'Hunger': this.needs.hunger,
+      'Mood': this.needs.mood
+    }
   }
 }
 

@@ -302,8 +302,17 @@ class Commands {
    * @param {Array} args
    */
   static showSettlement(manager, message, args = []) {
-    const name = args.join(" ");
-    const settlement = manager.getSettlement(name);
+    let name = args.join(" ");
+
+    if(!name) {
+      const colonist = manager.getColonist(message.author.id);
+
+      if (!colonist.hasSettlement()) {
+        return Commands.sendError(message, 'You do not belong to a settlement');
+      }
+
+      name = colonist.settlement;
+    }
 
     if (!manager.hasSettlement(name)) {
       return Commands.sendError(message, `No settlement with name \`${name}\``);
