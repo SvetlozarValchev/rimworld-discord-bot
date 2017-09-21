@@ -11,6 +11,19 @@ class Settlement {
      * @type {Inventory}
      */
     this.inventory = new Inventory();
+
+    /**
+     * @type {number}
+     */
+    this.members = 1;
+  }
+
+  addMember() {
+    this.members += 1;
+  }
+
+  removeMember() {
+    this.members -= 1;
   }
 
   /**
@@ -21,6 +34,7 @@ class Settlement {
     const data = JSON.parse(dataString);
 
     this.name = name;
+    this.members = data.members;
     this.inventory = new Inventory();
     this.inventory.set(data.inventory);
   }
@@ -32,6 +46,7 @@ class Settlement {
     return {
       $name: this.name,
       $data: JSON.stringify({
+        members: this.members,
         inventory: this.inventory.get()
       })
     }

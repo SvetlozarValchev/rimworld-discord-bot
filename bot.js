@@ -20,9 +20,9 @@ client.on("message", (message) => {
   if (message.author.bot) {
     return;
   } // Ignore bots.
-  // if (message.channel.name !== "my-secret-dev-channel") {
-  //   return;
-  // } // Only certain channel
+  if (message.channel.name !== "my-secret-dev-channel") {
+    // return;
+  } // Only certain channel
 
   if (message.content.substring(0, 1) !== '!') {
     return;
@@ -39,32 +39,31 @@ client.on("message", (message) => {
       break;
     }
     case 'stats': {
-      Commands.showStats(manager, message, args);
-      break;
+      return Commands.showStats(manager, message, args);
     }
     case 'join': {
-      Commands.addColonist(manager, message, args);
-      break;
+      return Commands.addColonist(manager, message, args);
     }
     case 'colonists': {
-      Commands.showColonists(manager, message, args);
-      break;
+      return Commands.showColonists(manager, message, args);
     }
     case 'colonist': {
-      Commands.showColonist(manager, message, args);
-      break;
+      return Commands.showColonist(manager, message, args);
     }
     case 'inventory': {
-      Commands.showInventory(manager, message, args);
-      break;
+      return Commands.showInventory(manager, message, args);
     }
     case 'settle': {
-      Commands.addSettlement(manager, message, args);
-      break;
+      return Commands.addSettlement(manager, message, args);
     }
     case 'settlements': {
-      Commands.showSettlements(manager, message, args);
-      break;
+      return Commands.showSettlements(manager, message, args);
+    }
+    case 'settlement': {
+      return Commands.showSettlement(manager, message, args);
+    }
+    case 'abandon': {
+      return Commands.abandonSettlement(manager, message, args);
     }
   }
 });

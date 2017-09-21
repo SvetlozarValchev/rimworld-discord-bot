@@ -5,10 +5,28 @@ class Colonist {
   /**
    * @param {string} userId
    * @param {string} username
+   * @param {string|null} nickname
    */
-  constructor(userId = '', username = '') {
+  constructor(userId = '', username = '', nickname) {
+    /**
+     * @type {string}
+     */
     this.userId = userId;
+
+    /**
+     * @type {string}
+     */
     this.username = username;
+
+    /**
+     * @type {*}
+     */
+    this.nickname = nickname;
+
+    /**
+     * @type {string}
+     */
+    this.settlement = null;
 
     /**
      * @type {Object}
@@ -27,6 +45,14 @@ class Colonist {
     this.inventory = new Inventory();
   }
 
+  hasSettlement() {
+    return this.settlement !== null;
+  }
+
+  setSettlement(settlement) {
+    this.settlement = settlement;
+  }
+
   /**
    * @returns {Object}
    */
@@ -35,6 +61,8 @@ class Colonist {
       $userId: this.userId,
       $username: this.username,
       $data: JSON.stringify({
+        nickname: this.nickname,
+        settlement: this.settlement,
         needs: {
           health: this.needs.health,
           hunger: this.needs.hunger,
@@ -55,6 +83,9 @@ class Colonist {
 
     this.userId = userId;
     this.username = username;
+
+    this.nickname = data.nickname;
+    this.settlement = data.settlement;
     this.needs = data.needs;
     this.inventory.set(data.inventory);
   }
