@@ -136,7 +136,7 @@ class TicTacToe {
     let has = false;
 
     instances.forEach((instance) => {
-      if(instance.player === name || instance.opponent === name) {
+      if (instance.player === name || instance.opponent === name) {
         has = true;
       }
     });
@@ -152,7 +152,7 @@ class TicTacToe {
     let inst = null;
 
     instances.forEach((instance) => {
-      if(instance.player === name || instance.opponent === name) {
+      if (instance.player === name || instance.opponent === name) {
         inst = instance;
       }
     });
@@ -165,7 +165,7 @@ class TicTacToe {
    */
   static deleteInstance(playerOrOpponentName) {
     instances.forEach((instance, idx) => {
-      if(instance.player === playerOrOpponentName || instance.opponent === playerOrOpponentName) {
+      if (instance.player === playerOrOpponentName || instance.opponent === playerOrOpponentName) {
         delete instances[idx];
       }
     });
@@ -195,7 +195,7 @@ class TicTacToe {
   static stop(manager, message, args = []) {
     const name = Commands.getNickname(message);
 
-    if(!TicTacToe.hasInstance(name)) {
+    if (!TicTacToe.hasInstance(name)) {
       return Commands.sendError(message, 'You don\'t have an active game; Type `!ttt help`');
     }
 
@@ -213,33 +213,33 @@ class TicTacToe {
     const player = Commands.getNickname(message);
     let opponent = args.join(" ");
 
-    if(!opponent) {
+    if (!opponent) {
       return Commands.sendError(message, 'You must type your opponent.');
     }
 
-    if(MentionRegex.test(opponent)) {
+    if (MentionRegex.test(opponent)) {
       const id = opponent.match(MentionRegex)[1];
       const member = message.channel.members.find('id', id);
 
       opponent = member.nickname || member.user && member.user.username;
     }
 
-    if(opponent === player) {
+    if (opponent === player) {
       return Commands.sendError(message, 'You can\'t challenge yourself.');
     }
 
-    if(TicTacToe.hasInstance(opponent)) {
+    if (TicTacToe.hasInstance(opponent)) {
       const instance = TicTacToe.getInstance(opponent);
 
-      if(instance.player !== player && instance.opponent !== player) {
+      if (instance.player !== player && instance.opponent !== player) {
         return Commands.sendError(message, 'Your opponent is already in an active game.');
       }
     }
 
-    if(TicTacToe.hasInstance(player)) {
+    if (TicTacToe.hasInstance(player)) {
       const instance = TicTacToe.getInstance(player);
 
-      if(instance.winType > 0) {
+      if (instance.winType > 0) {
         TicTacToe.deleteInstance(player);
       } else {
         return Commands.sendError(message, 'You already have an active game; Type `!ttt stop` to stop it.');
@@ -270,7 +270,7 @@ class TicTacToe {
    * @param {Array} args
    */
   static show(manager, message, args = []) {
-    if(!TicTacToe.hasInstance(Commands.getNickname(message))) {
+    if (!TicTacToe.hasInstance(Commands.getNickname(message))) {
       return Commands.sendError(message, 'You don\'t have an active game; Type `!ttt help`');
     }
 
@@ -285,7 +285,7 @@ class TicTacToe {
    * @param {Array} args
    */
   static set(manager, message, args = []) {
-    if(!TicTacToe.hasInstance(Commands.getNickname(message))) {
+    if (!TicTacToe.hasInstance(Commands.getNickname(message))) {
       return Commands.sendError(message, 'You don\'t have an active game; Type `!ttt help`');
     }
 
@@ -294,25 +294,25 @@ class TicTacToe {
     const tileType = isPlayer ? TicTacToe.tile.cross : TicTacToe.tile.circle;
     let [position1, position2] = args;
 
-    if(instance.winType > 0) {
+    if (instance.winType > 0) {
       return Commands.sendError(message, 'Game already ended');
     }
 
-    if((isPlayer && !instance.playerTurn) || (!isPlayer && instance.playerTurn)) {
+    if ((isPlayer && !instance.playerTurn) || (!isPlayer && instance.playerTurn)) {
       return Commands.sendError(message, 'It\'s not your turn');
     }
 
-    if(!position1 && !position2) {
+    if (!position1 && !position2) {
       return;
     }
 
     let pos = [0, 0];
 
-    if(position1 === 'middle' && (!position2 || position2 === 'middle')) {
+    if (position1 === 'middle' && (!position2 || position2 === 'middle')) {
       pos = [1, 1];
-    } else if(position1 === 'left') {
+    } else if (position1 === 'left') {
       pos = [0, 1];
-    } else if(position1 === 'right') {
+    } else if (position1 === 'right') {
       pos = [2, 1];
     } else {
       let yPos;
@@ -331,14 +331,14 @@ class TicTacToe {
       }
     }
 
-    if(instance.getTile(pos[0], pos[1]) !== TicTacToe.tile.none) {
+    if (instance.getTile(pos[0], pos[1]) !== TicTacToe.tile.none) {
       return Commands.sendError(message, 'Tile is already set');
     }
 
     instance.setMap(pos[0], pos[1], tileType);
     instance.checkWin();
 
-    if(instance.winType === TicTacToe.winType.none) {
+    if (instance.winType === TicTacToe.winType.none) {
       instance.toggleTurn();
     }
 
@@ -395,49 +395,49 @@ class TicTacToe {
 
     // top horizontal
     [tile1, tile2, tile3] = [this.getTile(0, 0), this.getTile(1, 0), this.getTile(2, 0)];
-    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+    if (tile1 && tile1 === tile2 && tile2 === tile3) {
       this.winType = TicTacToe.winType.horizontalTop;
     }
 
     // middle horizontal
     [tile1, tile2, tile3] = [this.getTile(0, 1), this.getTile(1, 1), this.getTile(2, 1)];
-    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+    if (tile1 && tile1 === tile2 && tile2 === tile3) {
       this.winType = TicTacToe.winType.horizontalMiddle;
     }
 
     // bottom horizontal
     [tile1, tile2, tile3] = [this.getTile(0, 2), this.getTile(1, 2), this.getTile(2, 2)];
-    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+    if (tile1 && tile1 === tile2 && tile2 === tile3) {
       this.winType = TicTacToe.winType.horizontalBottom;
     }
 
     // left vertical
     [tile1, tile2, tile3] = [this.getTile(0, 0), this.getTile(0, 1), this.getTile(0, 2)];
-    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+    if (tile1 && tile1 === tile2 && tile2 === tile3) {
       this.winType = TicTacToe.winType.verticalLeft;
     }
 
     // middle vertical
     [tile1, tile2, tile3] = [this.getTile(1, 0), this.getTile(1, 1), this.getTile(1, 2)];
-    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+    if (tile1 && tile1 === tile2 && tile2 === tile3) {
       this.winType = TicTacToe.winType.verticalMiddle;
     }
 
     // right vertical
     [tile1, tile2, tile3] = [this.getTile(2, 0), this.getTile(2, 1), this.getTile(2, 2)];
-    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+    if (tile1 && tile1 === tile2 && tile2 === tile3) {
       this.winType = TicTacToe.winType.verticalRight;
     }
 
     // diagonal left
     [tile1, tile2, tile3] = [this.getTile(0, 0), this.getTile(1, 1), this.getTile(2, 2)];
-    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+    if (tile1 && tile1 === tile2 && tile2 === tile3) {
       this.winType = TicTacToe.winType.diagonalLeft;
     }
 
     // diagonal right
     [tile1, tile2, tile3] = [this.getTile(2, 0), this.getTile(1, 1), this.getTile(0, 2)];
-    if(tile1 && tile1 === tile2 && tile2 === tile3) {
+    if (tile1 && tile1 === tile2 && tile2 === tile3) {
       this.winType = TicTacToe.winType.diagonalRight;
     }
 
@@ -445,13 +445,13 @@ class TicTacToe {
 
     this.map.forEach((row, y) => {
       row.forEach((tile, x) => {
-        if(tile !== TicTacToe.tile.none) {
+        if (tile !== TicTacToe.tile.none) {
           settedTiles++;
         }
       });
     });
 
-    if(settedTiles === 9) {
+    if (settedTiles === 9) {
       this.winType = TicTacToe.winType.draw;
     }
   }
@@ -478,13 +478,13 @@ class TicTacToe {
       row.forEach((tile, x) => {
         img = null;
 
-        if(tile === TicTacToe.tile.circle) {
+        if (tile === TicTacToe.tile.circle) {
           img = 'circle';
-        } else if(tile === TicTacToe.tile.cross) {
+        } else if (tile === TicTacToe.tile.cross) {
           img = 'cross';
         }
 
-        if(img) {
+        if (img) {
           this.ctx.drawImage(images[img].image, x * 50, y * 50, images[img].image.width, images[img].image.height);
         }
       });
@@ -502,19 +502,19 @@ class TicTacToe {
       default: break;
     }
 
-    if(winLine.image) {
+    if (winLine.image) {
       this.ctx.drawImage(images[winLine.image].image, winLine.x, winLine.y, images[winLine.image].image.width, images[winLine.image].image.height);
 
-      if(this.playerTurn) {
+      if (this.playerTurn) {
         title = `${this.player} Won!`;
       } else {
         title = `${this.opponent} Won!`;
       }
     } else {
-      if(this.winType === TicTacToe.winType.draw) {
+      if (this.winType === TicTacToe.winType.draw) {
         title = 'Draw!';
       } else {
-        if(this.playerTurn) {
+        if (this.playerTurn) {
           title = `**X** \`>${this.player}<\` vs. **O** \`${this.opponent}\``;
         } else {
           title = `**X** \`${this.player}\` vs. **O** \`>${this.opponent}<\``;

@@ -91,7 +91,7 @@ class Manager {
   createColonist(userId, username, nickname) {
     const colonist = new Colonist(userId, username, nickname);
 
-    return this.db.run("INSERT INTO colonists (userId, username, data) VALUES ($userId, $username, $data)",  colonist.get()).then(() => {
+    return this.db.run("INSERT INTO colonists (userId, username, data) VALUES ($userId, $username, $data)", colonist.get()).then(() => {
       this.colonists[userId] = colonist;
     }).catch(console.error);
   }
@@ -103,7 +103,7 @@ class Manager {
   createSettlement(name) {
     const settlement = new Settlement(name);
 
-    return this.db.run("INSERT INTO settlements (name, data) VALUES ($name, $data)",  settlement.get()).then(() => {
+    return this.db.run("INSERT INTO settlements (name, data) VALUES ($name, $data)", settlement.get()).then(() => {
       this.settlements[name] = settlement;
     }).catch((e) => Promise.reject(`Couldn't add Settlement.`));
   }
@@ -112,7 +112,7 @@ class Manager {
    * @param {string} userId
    */
   updateColonist(userId) {
-    if(!this.hasColonist(userId)) {
+    if (!this.hasColonist(userId)) {
       throw new Error(`No colonist with userId - ${userId}`);
     }
 
@@ -130,7 +130,7 @@ class Manager {
    * @param {string} name
    */
   updateSettlement(name) {
-    if(!this.hasSettlement(name)) {
+    if (!this.hasSettlement(name)) {
       throw new Error(`No settlement with name - ${name}`);
     }
 
@@ -149,7 +149,7 @@ class Manager {
    * @returns {Promise}
    */
   deleteSettlement(name) {
-    if(!this.hasSettlement(name)) {
+    if (!this.hasSettlement(name)) {
       throw new Error(`No settlement with name - ${name}`);
     }
 

@@ -27,7 +27,7 @@ class Inventory {
    * @param {Object} inventory
    */
   set(inventory) {
-    if(!inventory) {
+    if (!inventory) {
       return;
     }
 
@@ -45,14 +45,14 @@ class Inventory {
    * @param {number} amount
    */
   addItem(name, quality, amount) {
-    if(amount <= 0) {
+    if (amount <= 0) {
       throw new Error('Amount has to be at least 1');
     }
 
     const itemName = Inventory.itemName(name, quality);
     let item = this.items[itemName];
 
-    if(item) {
+    if (item) {
       item.addAmount(amount);
     } else {
       item = new Item();
@@ -70,17 +70,17 @@ class Inventory {
    * @param {number} amount
    */
   removeItem(name, quality, amount) {
-    if(amount <= 0) {
+    if (amount <= 0) {
       throw new Error('Amount has to be at least 1');
     }
 
     const itemName = Inventory.itemName(name, quality);
     let item = this.items[itemName];
 
-    if(item) {
+    if (item) {
       item.addAmount(amount);
 
-      if(item.amount <= 0) {
+      if (item.amount <= 0) {
         delete this.items[itemName];
       }
     } else {

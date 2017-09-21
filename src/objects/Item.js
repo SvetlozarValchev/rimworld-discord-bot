@@ -54,7 +54,7 @@ class Item {
    * @param {Object} item
    */
   set(item) {
-    if(!item) {
+    if (!item) {
       return;
     }
 

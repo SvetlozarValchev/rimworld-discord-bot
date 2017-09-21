@@ -309,7 +309,7 @@ class Commands {
   static showSettlement(manager, message, args = []) {
     let name = args.join(" ");
 
-    if(!name) {
+    if (!name) {
       const colonist = manager.getColonist(message.author.id);
 
       if (!colonist.hasSettlement()) {
