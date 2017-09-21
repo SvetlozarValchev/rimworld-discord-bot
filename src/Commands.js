@@ -199,6 +199,11 @@ class Commands {
     return colonistsFilter;
   }
 
+  /**
+   * @param {Manager} manager
+   * @param {Message} message
+   * @param {Array} args
+   */
   static showInventory(manager, message, args = []) {
     if (!manager.hasColonist(message.author.id)) {
       return Commands.noColonistMessage(message, 'Inventory');

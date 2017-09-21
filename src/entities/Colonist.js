@@ -104,15 +104,6 @@ class Colonist {
     this.stats = data.stats;
     this.inventory.set(data.inventory);
   }
-
-
-  getNeeds() {
-    return {
-      'Health': this.needs.health,
-      'Hunger': this.needs.hunger,
-      'Mood': this.needs.mood
-    }
-  }
 }
 
 module.exports = Colonist;

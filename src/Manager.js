@@ -96,6 +96,10 @@ class Manager {
     }).catch(console.error);
   }
 
+  /**
+   * @param {string} name
+   * @returns {Promise}
+   */
   createSettlement(name) {
     const settlement = new Settlement(name);
 
@@ -104,6 +108,9 @@ class Manager {
     }).catch((e) => Promise.reject(`Couldn't add Settlement.`));
   }
 
+  /**
+   * @param {string} userId
+   */
   updateColonist(userId) {
     if(!this.hasColonist(userId)) {
       throw new Error(`No colonist with userId - ${userId}`);
@@ -119,6 +126,9 @@ class Manager {
     });
   }
 
+  /**
+   * @param {string} name
+   */
   updateSettlement(name) {
     if(!this.hasSettlement(name)) {
       throw new Error(`No settlement with name - ${name}`);
@@ -134,6 +144,10 @@ class Manager {
     });
   }
 
+  /**
+   * @param {string} name
+   * @returns {Promise}
+   */
   deleteSettlement(name) {
     if(!this.hasSettlement(name)) {
       throw new Error(`No settlement with name - ${name}`);
@@ -142,14 +156,6 @@ class Manager {
     return this.db.run("DELETE FROM settlements WHERE name=$name", {
       $name: name
     }).then(() => delete this.settlements[name]);
-  }
-
-  load() {
-
-  }
-
-  create() {
-
   }
 }
 
