@@ -1,5 +1,4 @@
 const Inventory = require('../objects/Inventory');
-const ColonistStats = require('../objects/ColonistStats');
 
 class Colonist {
   /**
@@ -7,7 +6,7 @@ class Colonist {
    * @param {string} username
    * @param {string|null} nickname
    */
-  constructor(userId = '', username = '', nickname) {
+  constructor(userId, username, nickname) {
     /**
      * @type {string}
      */
@@ -57,10 +56,16 @@ class Colonist {
     this.inventory = new Inventory();
   }
 
+  /**
+   * @returns {boolean}
+   */
   hasSettlement() {
     return this.settlement !== null;
   }
 
+  /**
+   * @param {string|null} settlement
+   */
   setSettlement(settlement) {
     this.settlement = settlement;
   }
@@ -99,6 +104,7 @@ class Colonist {
     this.stats = data.stats;
     this.inventory.set(data.inventory);
   }
+
 
   getNeeds() {
     return {
