@@ -14,4 +14,4 @@ Add `C:\GTK\bin` (GTK path) to your OS Path variable
 
 ## Start:
 
-`$ node bot.js`
+`$ npm start`
