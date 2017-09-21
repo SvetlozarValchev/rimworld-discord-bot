@@ -17,7 +17,7 @@ client.on('ready', (evt) => {
 
 client.on("message", /** @type {Message} */ (message) => {
   if (message.author.bot) {
-    // return;
+    return;
   } // Ignore bots.
   if (message.channel.name !== "my-secret-dev-channel") {
     // return;

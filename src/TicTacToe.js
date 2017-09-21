@@ -217,12 +217,20 @@ class TicTacToe {
       opponent = member.nickname || member.user && member.user.username;
     }
 
-    if(opponent === Commands.getNickname(message)) {
+    if(opponent === player) {
       return Commands.sendError(message, 'You can\'t challenge yourself.');
     }
 
-    if(TicTacToe.hasInstance(player) || TicTacToe.hasInstance(opponent)) {
-      const instance = TicTacToe.getInstance(Commands.getNickname(message));
+    if(TicTacToe.hasInstance(opponent)) {
+      const instance = TicTacToe.getInstance(opponent);
+
+      if(instance.player !== player && instance.opponent !== player) {
+        return Commands.sendError(message, 'Your opponent is already in an active game.');
+      }
+    }
+
+    if(TicTacToe.hasInstance(player)) {
+      const instance = TicTacToe.getInstance(player);
 
       if(instance.winType > 0) {
         TicTacToe.deleteInstance(player);
@@ -277,7 +285,7 @@ class TicTacToe {
     const instance = TicTacToe.getInstance(Commands.getNickname(message));
     const isPlayer = instance.isPlayer(message);
     const tileType = isPlayer ? TicTacToe.tile.cross : TicTacToe.tile.circle;
-    const [position1, position2] = args;
+    let [position1, position2] = args;
 
     if(instance.winType > 0) {
       return Commands.sendError(message, 'Game already ended');
@@ -291,12 +299,14 @@ class TicTacToe {
       return;
     }
 
+    let pos = [0, 0];
+
     if(position1 === 'middle' && (!position2 || position2 === 'middle')) {
-      instance.setMap(1, 1, tileType);
+      pos = [1, 1];
     } else if(position1 === 'left') {
-      instance.setMap(0, 1, tileType);
+      pos = [0, 1];
     } else if(position1 === 'right') {
-      instance.setMap(2, 1, tileType);
+      pos = [2, 1];
     } else {
       let yPos;
 
@@ -308,12 +318,17 @@ class TicTacToe {
       }
 
       switch(position2) {
-        case 'left': instance.setMap(0, yPos, tileType); break;
-        case 'right': instance.setMap(2, yPos, tileType); break;
-        default: instance.setMap(1, yPos, tileType);
+        case 'left': pos = [0, yPos]; break;
+        case 'right': pos = [2, yPos]; break;
+        default: pos = [1, yPos];
       }
     }
 
+    if(instance.getTile(pos[0], pos[1]) !== TicTacToe.tile.none) {
+      return Commands.sendError(message, 'Tile is already set');
+    }
+
+    instance.setMap(pos[0], pos[1], tileType);
     instance.checkWin();
 
     if(instance.winType === TicTacToe.winType.none) {
