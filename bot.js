@@ -71,7 +71,7 @@ client.on("message", /** @type {Message} */ (message) => {
       break;
     }
     case 'comic': {
-      Comics.random(message, args); break;
+      Comics.comic(message, args); break;
     }
   }
 });
@@ -89,6 +89,8 @@ function init() {
     .then(() => db.run("CREATE TABLE IF NOT EXISTS colonists (userId TEXT, username TEXT, data TEXT)"))
     .catch(err => console.error(err.stack))
     .then(() => db.run("CREATE TABLE IF NOT EXISTS settlements (name TEXT, data TEXT)"))
+    .catch(err => console.error(err.stack))
+    .then(() => db.run("CREATE TABLE IF NOT EXISTS comics (name TEXT, data TEXT)"))
     .catch(err => console.error(err.stack))
 }
 

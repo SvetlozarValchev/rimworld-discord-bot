@@ -23,16 +23,33 @@ const offsets = {
   end: {x: 400, y: 0}
 };
 
+const lastComic = {
+  begin: '',
+  middle: '',
+  end: ''
+};
+
 const Comics = {
-  drawRandomImage(ctx, type) {
-    const filename = comicStrips[type][Math.floor(Math.random()*comicStrips[type].length)];
+  stripImage(filename, type) {
     const img = new Image();
 
     img.src = fs.readFileSync(path.join(IMG_PATH, type, filename));
 
+    return img;
+  },
+
+  drawRandomImage(ctx, type) {
+    const filename = comicStrips[type][Math.floor(Math.random()*comicStrips[type].length)];
+
+    return Comics.drawImage(filename, ctx, type);
+  },
+
+  drawImage(filename, ctx, type) {
+    const img = Comics.stripImage(filename, type);
+
     ctx.drawImage(img, offsets[type].x, offsets[type].y, img.width, img.height);
 
-    return img;
+    return filename;
   },
 
   fetchStrips() {
@@ -53,17 +70,53 @@ const Comics = {
     });
   },
 
+  reroll(message, args) {
+    const panelNum = parseInt(args[0]);
+    const canvas = new Canvas(600, 200);
+    const ctx = canvas.getContext('2d');
+
+    Comics.fetchStrips();
+
+    if(panelNum === 1) {
+      lastComic.begin = Comics.drawRandomImage(ctx, types.begin);
+      lastComic.middle = Comics.drawImage(lastComic.middle, ctx, types.middle);
+      lastComic.end = Comics.drawImage(lastComic.end, ctx, types.end);
+    } else if(panelNum === 2) {
+      lastComic.begin = Comics.drawImage(lastComic.begin,ctx, types.begin);
+      lastComic.middle = Comics.drawRandomImage(ctx, types.middle);
+      lastComic.end = Comics.drawImage(lastComic.end, ctx, types.end);
+    } else if(panelNum === 3) {
+      lastComic.begin = Comics.drawImage(lastComic.begin, ctx, types.begin);
+      lastComic.middle = Comics.drawImage(lastComic.middle, ctx, types.middle);
+      lastComic.end = Comics.drawRandomImage(ctx, types.end);
+    } else {
+      return;
+    }
+
+    return message.channel.send('', new Discord.Attachment(canvas.toBuffer()));
+  },
+
   random(message, args) {
     const canvas = new Canvas(600, 200);
     const ctx = canvas.getContext('2d');
 
     Comics.fetchStrips();
 
-    Comics.drawRandomImage(ctx, types.begin);
-    Comics.drawRandomImage(ctx, types.middle);
-    Comics.drawRandomImage(ctx, types.end);
+    lastComic.begin = Comics.drawRandomImage(ctx, types.begin);
+    lastComic.middle = Comics.drawRandomImage(ctx, types.middle);
+    lastComic.end = Comics.drawRandomImage(ctx, types.end);
 
-    return message.channel.send('', new Discord.Attachment(canvas.toBuffer()));;
+    return message.channel.send('', new Discord.Attachment(canvas.toBuffer()));
+  },
+
+  comic(message, args) {
+    const [panelNum] = args;
+
+    if(!panelNum) {
+      return Comics.random(message, args);
+    } else {
+      return Comics.reroll(message, args);
+    }
   }
 };
 
