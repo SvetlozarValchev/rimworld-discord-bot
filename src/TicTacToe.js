@@ -48,10 +48,12 @@ const instances = [];
 
 class TicTacToe {
   /**
+   * @param {string} playerID
    * @param {string} player
    * @param {string} opponent
+   * @param {string} opponentID
    */
-  constructor(player, opponent) {
+  constructor(playerID, player, opponent, opponentID) {
     /**
      * @type {canvas.Canvas}
      */
@@ -70,11 +72,21 @@ class TicTacToe {
     /**
      * @type {string}
      */
+    this.playerID = playerID;
+
+    /**
+     * @type {string}
+     */
     this.player = player;
 
     /**
      * @type {string}
      */
+    this.opponentID = opponentID;
+
+    /**
+     * @type {string}
+     * */
     this.opponent = opponent;
 
     /**
@@ -129,14 +141,14 @@ class TicTacToe {
   }
 
   /**
-   * @param {string} name
+   * @param {string} playerID
    * @returns {boolean}
    */
-  static hasInstance(name) {
+  static hasInstance(playerID) {
     let has = false;
 
     instances.forEach((instance) => {
-      if (instance.player === name || instance.opponent === name) {
+      if (instance.playerID === playerID || instance.opponentID === playerID) {
         has = true;
       }
     });
@@ -145,14 +157,14 @@ class TicTacToe {
   }
 
   /**
-   * @param name
+   * @param {string} playerID
    * @returns {TicTacToe|null}
    */
-  static getInstance(name) {
+  static getInstance(playerID) {
     let inst = null;
 
     instances.forEach((instance) => {
-      if (instance.player === name || instance.opponent === name) {
+      if (instance.playerID === playerID || instance.opponentID === playerID) {
         inst = instance;
       }
     });
@@ -161,11 +173,11 @@ class TicTacToe {
   }
 
   /**
-   * @param {string} playerOrOpponentName
+   * @param {string} playerID
    */
-  static deleteInstance(playerOrOpponentName) {
+  static deleteInstance(playerID) {
     instances.forEach((instance, idx) => {
-      if (instance.player === playerOrOpponentName || instance.opponent === playerOrOpponentName) {
+      if (instance.playerID === playerID || instance.opponentID === playerID) {
         delete instances[idx];
       }
     });
@@ -193,13 +205,13 @@ class TicTacToe {
    * @param {Array} args
    */
   static stop(manager, message, args = []) {
-    const name = Commands.getNickname(message);
+    const nameID = message.author.id;
 
-    if (!TicTacToe.hasInstance(name)) {
+    if (!TicTacToe.hasInstance(nameID)) {
       return Commands.sendError(message, 'You don\'t have an active game; Type `!ttt help`');
     }
 
-    TicTacToe.deleteInstance(name);
+    TicTacToe.deleteInstance(nameID);
 
     return Commands.sendSuccess(message, 'Your game was stopped.');
   }
@@ -211,42 +223,50 @@ class TicTacToe {
    */
   static play(manager, message, args = []) {
     const player = Commands.getNickname(message);
-    let opponent = args.join(" ");
-
-    if (!opponent) {
+    const playerID = message.author.id;
+    const opponentVanilla = args.join(" ");
+    if (!opponentVanilla) {
       return Commands.sendError(message, 'You must type your opponent.');
     }
 
-    if (MentionRegex.test(opponent)) {
-      const id = opponent.match(MentionRegex)[1];
+    if (MentionRegex.test(opponentVanilla)) {
+      const id = opponentVanilla.match(MentionRegex)[1];
       const member = message.channel.members.find('id', id);
 
-      opponent = member.nickname || member.user && member.user.username;
+      var opponent = member.nickname || member.user && member.user.username;
+      var opponentID = member.id;
     }
-
-    if (opponent === player) {
+    if (!opponent) {
+      let multipleCheck = Commands.nickToUser(message, opponentVanilla);
+      if (!multipleCheck) {
+        return Commands.sendError(message, 'There is multiple people with the same username or nickname');
+      }
+      var opponent = multipleCheck.id;
+    }
+    if (opponentID === playerID) {
       return Commands.sendError(message, 'You can\'t challenge yourself.');
     }
 
-    if (TicTacToe.hasInstance(opponent)) {
-      const instance = TicTacToe.getInstance(opponent);
+    if (TicTacToe.hasInstance(opponentID)) {
+      const instance = TicTacToe.getInstance(opponentID);
 
-      if (instance.player !== player && instance.opponent !== player) {
+      if (instance.playerID !== playerID || instance.opponent !== playerID) {
         return Commands.sendError(message, 'Your opponent is already in an active game.');
       }
+      return Commands.sendError(message, 'You\'re already playing against this person.');
     }
 
-    if (TicTacToe.hasInstance(player)) {
-      const instance = TicTacToe.getInstance(player);
+    if (TicTacToe.hasInstance(playerID)) {
+      const instance = TicTacToe.getInstance(playerID);
 
-      if (instance.winType > 0) {
-        TicTacToe.deleteInstance(player);
-      } else {
+      //if (instance.winType > 0) {
+      //  TicTacToe.deleteInstance(playerID);
+      // } else {
         return Commands.sendError(message, 'You already have an active game; Type `!ttt stop` to stop it.');
-      }
+      // }
     }
 
-    const instance = new TicTacToe(player, opponent);
+    const instance = new TicTacToe(playerID, player, opponent, opponentID);
 
     instances.push(instance);
 
@@ -270,11 +290,11 @@ class TicTacToe {
    * @param {Array} args
    */
   static show(manager, message, args = []) {
-    if (!TicTacToe.hasInstance(Commands.getNickname(message))) {
+    if (!TicTacToe.hasInstance(message.author.id)) {
       return Commands.sendError(message, 'You don\'t have an active game; Type `!ttt help`');
     }
 
-    const instance = TicTacToe.getInstance(Commands.getNickname(message));
+    const instance = TicTacToe.getInstance(message.author.id);
 
     return instance.beforeDraw(manager, message, args);
   }
@@ -285,12 +305,12 @@ class TicTacToe {
    * @param {Array} args
    */
   static set(manager, message, args = []) {
-    if (!TicTacToe.hasInstance(Commands.getNickname(message))) {
+    if (!TicTacToe.hasInstance(message.author.id)) {
       return Commands.sendError(message, 'You don\'t have an active game; Type `!ttt help`');
     }
 
-    const instance = TicTacToe.getInstance(Commands.getNickname(message));
-    const isPlayer = instance.isPlayer(message);
+    const instance = TicTacToe.getInstance(message.author.id);
+    const isPlayer = instance.isPlayer(message.author.id);
     const tileType = isPlayer ? TicTacToe.tile.cross : TicTacToe.tile.circle;
     let [position1, position2] = args;
 
@@ -346,11 +366,11 @@ class TicTacToe {
   }
 
   /**
-   * @param {Message} message
+   * @param {string} playerID
    * @returns {boolean}
    */
-  isPlayer(message) {
-    return this.player === Commands.getNickname(message);
+  isPlayer(playerID) {
+    return this.playerID === playerID;
   }
 
   /**
