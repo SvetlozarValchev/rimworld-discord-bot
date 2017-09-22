@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 const Commands = require('./Commands');
 
 const Image = Canvas.Image;
-const IMG_PATH = path.join(__dirname, '..', 'assets');
+const IMG_PATH = path.join(__dirname, '..', 'assets', 'tictactoe');
 const MentionRegex = new RegExp(/\<@!?([0-9]+)\>/);
 
 const images = {
