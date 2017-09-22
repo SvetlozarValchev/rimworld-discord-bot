@@ -100,7 +100,7 @@ class Commands {
       return message.author;
     }
     let matchingUsers = {};
-    for(i=0; i === message.guild.members.size; i++) {
+    for(let i=0; i === message.guild.members.size; i++) {
       if (message.guild.members[i].nickname === nickname || message.guild.members[i] === nickname) {
         matchingUsers.push(message.guild.members[i]);
       }
