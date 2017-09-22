@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload</title>
+</head>
+<body>
+    <h1>Upload comics strips</h1>
+
+<form action="fileupload" method="post" enctype="multipart/form-data">
+    <label for="secret">Secret</label>
+    <input id="secret" name="secret" type="password" required>
+    <br /><br />
+    <label for="type">Type</label>
+    <select name="type" id="type" required>
+        <option></option>
+        <option value="begin">Beginning</option>
+        <option value="middle">Middle</option>
+        <option value="end">End</option>
+    </select>
+    <br /><br />
+    <label for="file">File</label>
+    <input type="file" name="uploadfile" id="file" required>
+    <br />
+    <br />
+    <input type="submit">
+</form>
+</body>
+</html>
