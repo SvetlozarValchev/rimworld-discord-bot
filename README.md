@@ -15,3 +15,8 @@ Check installation requirements for [node-canvas](https://github.com/Automattic/
 ## Start:
 
 `$ npm start`
+
+## Helper libraries
+
+https://github.com/Unitech/pm2
+
