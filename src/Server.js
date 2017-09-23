@@ -1,3 +1,4 @@
+const fs = require('fs');
 const mv = require('mv');
 const path = require('path');
 const express = require('express');
@@ -6,14 +7,86 @@ const uniqueSlug = require('unique-slug');
 const auth = require('../auth.json');
 
 const COMICS_PATH = path.join(__dirname, '..', 'assets', 'comics');
+const comicTypes = {
+  begin: 'begin',
+  middle: 'middle',
+  end: 'end'
+};
+const regexValidFilename = new RegExp(/^[0-9a-zA-Z_.]+$/);
 
 const Server = {
   start() {
     // Express server
     const app = express();
 
+    // Upload Strips
     app.get('/upload', function (req, res) {
-      res.sendFile(path.join(__dirname, '..', 'www', 'upload.html'));
+      res.sendFile(path.join(__dirname, '..', 'www', 'uploadStrip.html'));
+    });
+
+    app.get('/allUploaded', function (req, res) {
+      res.sendFile(path.join(__dirname, '..', 'www', 'uploadedStrips.html'));
+    });
+
+    app.get('/uploadedStrips/:type', function (req, res) {
+      if(req.params.type !== 'begin' && req.params.type !== 'middle' && req.params.type !== 'end') {
+        res.send('Invalid type');
+        return;
+      }
+
+      fs.readdir(path.join(COMICS_PATH, req.params.type), (err, strips) => {
+        const stripsCollection = [];
+
+        strips.forEach(strip => {
+          stripsCollection.push(strip);
+        });
+
+        res.send(JSON.stringify({strips: stripsCollection}));
+      });
+    });
+
+    app.get('/viewStrip/:type/:strip', function (req, res) {
+      if(req.params.type !== 'begin' && req.params.type !== 'middle' && req.params.type !== 'end') {
+        res.send('Invalid type');
+        return;
+      }
+
+      if(!regexValidFilename.test(req.params.strip)) {
+        res.send('Invalid Strip name');
+        return;
+      }
+
+      const filePath = path.join(COMICS_PATH, req.params.type, req.params.strip);
+
+      res.sendFile(filePath, function(err) {
+        if(err) {
+          res.status(404)
+            .send('Not found');
+        }
+      });
+    });
+
+    app.get('/deleteStrip/:type/:strip', function (req, res) {
+      if(req.params.type !== 'begin' && req.params.type !== 'middle' && req.params.type !== 'end') {
+        res.send('Invalid type');
+        return;
+      }
+
+      if(!regexValidFilename.test(req.params.strip)) {
+        res.send('Invalid Strip name');
+        return;
+      }
+
+      const filePath = path.join(COMICS_PATH, req.params.type, req.params.strip);
+
+      fs.unlink(filePath, function(err) {
+        if(err) {
+          res.status(404)
+            .send('Not found');
+        } else {
+          res.send('File deleted');
+        }
+      })
     });
 
     app.post('/fileupload', function (req, res) {

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        table {
+            float: left;
+            border: 1px solid #000;
+        }
+
+        table td {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+<table id="beginHolder">
+    <tr>
+        <th>Begin Strips</th>
+        <th>Action</th>
+    </tr>
+</table>
+<table id="middleHolder">
+    <tr>
+        <th>Middle Strips</th>
+        <th>Action</th>
+    </tr>
+</table>
+<table id="endHolder">
+    <tr>
+        <th>End Strips</th>
+        <th>Action</th>
+    </tr>
+</table>
+<script>
+  (function () {
+    var types = {
+      begin: 'begin',
+      middle: 'middle',
+      end: 'end'
+    };
+
+    var holders = {
+      begin: document.getElementById('beginHolder'),
+      middle: document.getElementById('middleHolder'),
+      end: document.getElementById('endHolder'),
+    };
+
+    function requestStrips(type, onSuccess) {
+      var xhr = new XMLHttpRequest();
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          onSuccess(xhr.responseText);
+        }
+      };
+
+      xhr.open('GET', '/uploadedStrips/' + type, true);
+      xhr.send();
+    }
+
+    function createRow(type, strip) {
+      var row = holders[type].insertRow(-1);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+
+      // Add some text to the new cells:
+      cell1.innerHTML = `<a href="/viewStrip/${type}/${strip}">${strip}</a>`;
+      cell2.innerHTML = `<a href="/deleteStrip/${type}/${strip}" onclick="return confirm('Are you sure?');">Delete</a>`;
+    }
+
+    requestStrips(types.begin, function (stripsRes) {
+      var strips = JSON.parse(stripsRes).strips;
+
+      strips.forEach(function (strip) {
+        createRow(types.begin, strip);
+      });
+    });
+
+    requestStrips(types.middle, function (stripsRes) {
+      var strips = JSON.parse(stripsRes).strips;
+
+      strips.forEach(function (strip) {
+        createRow(types.middle, strip);
+      });
+    });
+
+    requestStrips(types.end, function (stripsRes) {
+      var strips = JSON.parse(stripsRes).strips;
+
+      strips.forEach(function (strip) {
+        createRow(types.end, strip);
+      });
+    });
+  })();
+</script>
+</body>
+</html>
