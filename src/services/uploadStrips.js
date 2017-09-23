@@ -105,7 +105,7 @@ class ServiceUploadStrips {
         res.status(404)
           .send('Not found');
       } else {
-        res.redirect('/uploadedGifs');
+        res.redirect('/uploadedStrips');
       }
     })
   }

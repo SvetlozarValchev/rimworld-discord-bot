@@ -79,7 +79,7 @@ class ServiceUploadGifs {
     }
 
     if (!ServiceBase.regexValidFilename.test(req.params.gif)) {
-      res.send('Invalid Strip name');
+      res.send('Invalid Gif name');
       return;
     }
 
