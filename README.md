@@ -2,15 +2,25 @@
 
 ## Installation:
 
-Check installation requirements for [node-canvas](https://github.com/Automattic/node-canvas)
+1. Install NodeJS  
 
-##### For windows - https://github.com/Automattic/node-canvas/wiki/Installation---Windows
+2. Check installation requirements for [node-canvas](https://github.com/Automattic/node-canvas)
+  
+2. `$ npm install`  
 
-1. Make sure to have same versions of node and GTK
+### Configuring your own instance
 
-2. Add `C:\GTK\bin` (GTK path) to your OS Path variable
+1. Create your bot app here: https://discordapp.com/developers/applications/me
 
-`$ npm install`
+2. Create your own Discord Server
+
+3. Add bot to server  
+
+    a. Open this URL and change with your Bot Client ID: https://discordapp.com/oauth2/authorize?client_id=CLIENT_ID_GOES_HERE&scope=bot&permissions=0
+      
+    b. Choose from the dropdown your server
+    
+4. Fill your Bot Token in `auth.json`
 
 ## Start:
 
@@ -19,4 +29,3 @@ Check installation requirements for [node-canvas](https://github.com/Automattic/
 ## Helper libraries
 
 https://github.com/Unitech/pm2
-
