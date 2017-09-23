@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        table {
+            float: left;
+            border: 1px solid #000;
+        }
+
+        table td {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+<h4><a href="/uploadGif">Upload GIFs</a></h4>
+
+<h1>Current Strips</h1>
+<table id="gifHolder">
+    <tr>
+        <th>GIF</th>
+        <th>Action</th>
+    </tr>
+</table>
+
+<script>
+  (function () {
+    var holder = document.getElementById('gifHolder');
+
+    function requestGifs(onSuccess) {
+      var xhr = new XMLHttpRequest();
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          onSuccess(xhr.responseText);
+        }
+      };
+
+      xhr.open('GET', '/fetchUploadedGifs', true);
+      xhr.send();
+    }
+
+    function createRow(gif) {
+      var row = holder.insertRow(-1);
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+
+      // Add some text to the new cells:
+      cell1.innerHTML = `<a href="/viewGif/${gif}">${gif}</a>`;
+      cell2.innerHTML = `<a href="/deleteGif/${gif}" onclick="return confirm('Are you sure?');">Delete</a>`;
+    }
+
+    requestGifs(function (stripsRes) {
+      var gifs = JSON.parse(stripsRes).gifs;
+
+      gifs.forEach(function (gif) {
+        createRow(gif);
+      });
+    });
+  })();
+</script>
+</body>
+</html>

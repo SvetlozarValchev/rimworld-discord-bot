@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload</title>
+</head>
+<body>
+    <h1>Upload GIF</h1>
+
+<form action="uploadGifFile" method="post" enctype="multipart/form-data">
+    <label for="name">Name</label>
+    <input type="text" name="name" id="name" />
+    <br /><br />
+    <label for="file">File</label>
+    <input type="file" name="uploadfile" id="file" required />
+    <br />
+    <br />
+    <input type="submit">
+</form>
+
+<h1><a href="/uploadedGifs">All uploaded gifs</a></h1>
+<h3><a href="/upload">Upload main</a></h3>
+</body>
+</html>

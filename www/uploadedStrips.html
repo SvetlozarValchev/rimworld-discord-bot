@@ -15,7 +15,7 @@
     </style>
 </head>
 <body>
-<h4><a href="/upload">Upload Strips</a></h4>
+<h4><a href="/uploadStrip">Upload Strips</a></h4>
 
 <h1>Current Strips</h1>
 <table id="beginHolder">
@@ -59,7 +59,7 @@
         }
       };
 
-      xhr.open('GET', '/uploadedStrips/' + type, true);
+      xhr.open('GET', '/fetchUploadedStrips/' + type, true);
       xhr.send();
     }
 

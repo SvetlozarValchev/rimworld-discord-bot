@@ -7,7 +7,7 @@
 <body>
     <h1>Upload comics strips</h1>
 
-<form action="fileupload" method="post" enctype="multipart/form-data">
+<form action="uploadStripFile" method="post" enctype="multipart/form-data">
     <label for="type">Type</label>
     <select name="type" id="type" required>
         <option></option>
@@ -23,6 +23,7 @@
     <input type="submit">
 </form>
 
-<h1><a href="/allUploaded">All uploaded strips</a></h1>
+<h1><a href="/uploadedStrips">All uploaded strips</a></h1>
+<h3><a href="/upload">Upload main</a></h3>
 </body>
 </html>

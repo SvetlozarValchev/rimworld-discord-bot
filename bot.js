@@ -7,6 +7,7 @@ const Commands = require('./src/Commands');
 const TicTacToe = require('./src/TicTacToe');
 const HttpServer = require('./src/Server');
 const Comics = require('./src/Comics');
+const Gifs = require('./src/Gifs');
 
 // Initialize
 const manager = new Manager(db);
@@ -72,6 +73,9 @@ client.on("message", /** @type {Message} */ (message) => {
     }
     case 'comic': {
       Comics.comic(message, args); break;
+    }
+    case 'gif': {
+      Gifs.gif(message, args); break;
     }
   }
 });

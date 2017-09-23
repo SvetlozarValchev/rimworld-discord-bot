@@ -106,7 +106,7 @@ const Comics = {
     lastComic.middle = Comics.drawRandomImage(ctx, types.middle);
     lastComic.end = Comics.drawRandomImage(ctx, types.end);
 
-    return message.channel.send('', new Discord.Attachment(canvas.toBuffer()));
+    return message.channel.send('', new Discord.Attachment(canvas.toBuffer(), 'comic.png'));
   },
 
   comic(message, args) {
