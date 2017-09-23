@@ -3,6 +3,12 @@ const formidable = require('formidable');
 const auth = require('../../auth.json');
 
 class ServiceBase {
+  static setRoutes(app) {
+    app.post('/auth', ServiceBase.routeAuth);
+
+    app.get('/upload', ServiceBase.routeUploadMain);
+  }
+
   static get wwwPath() {
     return path.join(__dirname, '..', '..', 'www');
   }
@@ -22,17 +28,12 @@ class ServiceBase {
   static authCheck(from, req, res) {
     if (req.session.logged !== auth.uploadSecret) {
       req.session.from = from;
+
       res.sendFile(path.join(ServiceBase.wwwPath, 'auth.html'));
       return false;
     }
 
     return true;
-  }
-
-  static setRoutes(app) {
-    app.post('/auth', ServiceBase.routeAuth);
-
-    app.get('/upload', ServiceBase.uploadMain);
   }
 
   static routeAuth(req, res) {
@@ -53,7 +54,7 @@ class ServiceBase {
     });
   }
 
-  static uploadMain(req, res) {
+  static routeUploadMain(req, res) {
     if (!ServiceBase.authCheck('/upload', req, res)) {
       return;
     }

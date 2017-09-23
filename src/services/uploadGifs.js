@@ -8,20 +8,20 @@ const ServiceBase = require('./base');
 
 class ServiceUploadGifs {
   static setRoutes(app) {
-    app.get('/uploadGif', ServiceUploadGifs.uploadGif);
+    app.get('/uploadGif', ServiceUploadGifs.routeUploadGif);
 
-    app.get('/uploadedGifs', ServiceUploadGifs.uploadedGifs);
+    app.get('/uploadedGifs', ServiceUploadGifs.routeUploadedGifs);
 
-    app.get('/fetchUploadedGifs', ServiceUploadGifs.fetchUploadedGifs);
+    app.get('/fetchUploadedGifs', ServiceUploadGifs.routeFetchUploadedGifs);
 
-    app.get('/viewGif/:gif', ServiceUploadGifs.viewGif);
+    app.get('/viewGif/:gif', ServiceUploadGifs.routeViewGif);
 
-    app.get('/deleteGif/:gif', ServiceUploadGifs.deleteGif);
+    app.get('/deleteGif/:gif', ServiceUploadGifs.routeDeleteGif);
 
-    app.post('/uploadGifFile', ServiceUploadGifs.uploadGifFile);
+    app.post('/uploadGifFile', ServiceUploadGifs.routeUploadGifFile);
   }
 
-  static uploadGif(req, res) {
+  static routeUploadGif(req, res) {
     if (!ServiceBase.authCheck('/uploadGif', req, res)) {
       return;
     }
@@ -29,7 +29,7 @@ class ServiceUploadGifs {
     res.sendFile(path.join(ServiceBase.wwwPath, 'uploadGif.html'));
   };
 
-  static uploadedGifs(req, res) {
+  static routeUploadedGifs(req, res) {
     if (!ServiceBase.authCheck('/uploadedGifs', req, res)) {
       return;
     }
@@ -37,7 +37,7 @@ class ServiceUploadGifs {
     res.sendFile(path.join(ServiceBase.wwwPath, 'uploadedGifs.html'));
   }
 
-  static fetchUploadedGifs(req, res) {
+  static routeFetchUploadedGifs(req, res) {
     if (!ServiceBase.authCheck(`/fetchUploadedGifs`, req, res)) {
       return;
     }
@@ -53,7 +53,7 @@ class ServiceUploadGifs {
     });
   }
 
-  static viewGif(req, res) {
+  static routeViewGif(req, res) {
     if (!ServiceBase.authCheck(`/viewGif/${req.params.gif}`, req, res)) {
       return;
     }
@@ -73,7 +73,7 @@ class ServiceUploadGifs {
     });
   }
 
-  static deleteGif(req, res) {
+  static routeDeleteGif(req, res) {
     if (!ServiceBase.authCheck(`/deleteGif/${req.params.gif}`, req, res)) {
       return;
     }
@@ -95,7 +95,7 @@ class ServiceUploadGifs {
     })
   }
 
-  static uploadGifFile(req, res) {
+  static routeUploadGifFile(req, res) {
     if (!ServiceBase.authCheck('/uploadGif', req, res)) {
       return;
     }

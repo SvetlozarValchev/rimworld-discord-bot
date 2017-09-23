@@ -7,7 +7,6 @@ const ServiceUploadGifs = require('./services/uploadGifs');
 
 const Server = {
   start() {
-    // Express server
     const app = express();
 
     app.use(session({

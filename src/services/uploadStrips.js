@@ -8,20 +8,20 @@ const ServiceBase = require('./base');
 
 class ServiceUploadStrips {
   static setRoutes(app) {
-    app.get('/uploadStrip', ServiceUploadStrips.uploadStrip);
+    app.get('/uploadStrip', ServiceUploadStrips.routeUploadStrip);
 
-    app.get('/uploadedStrips', ServiceUploadStrips.uploadedStrips);
+    app.get('/uploadedStrips', ServiceUploadStrips.routeUploadedStrips);
 
-    app.get('/fetchUploadedStrips/:type', ServiceUploadStrips.fetchUploadedStrips);
+    app.get('/fetchUploadedStrips/:type', ServiceUploadStrips.routeFetchUploadedStrips);
 
-    app.get('/viewStrip/:type/:strip', ServiceUploadStrips.viewStrip);
+    app.get('/viewStrip/:type/:strip', ServiceUploadStrips.routeViewStrip);
 
-    app.get('/deleteStrip/:type/:strip', ServiceUploadStrips.deleteStrip);
+    app.get('/deleteStrip/:type/:strip', ServiceUploadStrips.routeDeleteStrip);
 
-    app.post('/uploadStripFile', ServiceUploadStrips.uploadStripFile);
+    app.post('/uploadStripFile', ServiceUploadStrips.routeUploadStripFile);
   }
 
-  static uploadStrip(req, res) {
+  static routeUploadStrip(req, res) {
     if (!ServiceBase.authCheck('/uploadStrip', req, res)) {
       return;
     }
@@ -29,7 +29,7 @@ class ServiceUploadStrips {
     res.sendFile(path.join(ServiceBase.wwwPath, 'uploadStrip.html'));
   };
 
-  static uploadedStrips(req, res) {
+  static routeUploadedStrips(req, res) {
     if (!ServiceBase.authCheck('/uploadedStrips', req, res)) {
       return;
     }
@@ -37,7 +37,7 @@ class ServiceUploadStrips {
     res.sendFile(path.join(ServiceBase.wwwPath, 'uploadedStrips.html'));
   }
 
-  static fetchUploadedStrips(req, res) {
+  static routeFetchUploadedStrips(req, res) {
     if (!ServiceBase.authCheck(`/fetchUploadedStrips/${req.params.type}`, req, res)) {
       return;
     }
@@ -58,7 +58,7 @@ class ServiceUploadStrips {
     });
   }
 
-  static viewStrip(req, res) {
+  static routeViewStrip(req, res) {
     if (!ServiceBase.authCheck(`/viewStrip/${req.params.type}/${req.params.strip}`, req, res)) {
       return;
     }
@@ -83,7 +83,7 @@ class ServiceUploadStrips {
     });
   }
 
-  static deleteStrip(req, res) {
+  static routeDeleteStrip(req, res) {
     if (!ServiceBase.authCheck(`/deleteStrip/${req.params.type}/${req.params.strip}`, req, res)) {
       return;
     }
@@ -110,7 +110,7 @@ class ServiceUploadStrips {
     })
   }
 
-  static uploadStripFile(req, res) {
+  static routeUploadStripFile(req, res) {
     if (!ServiceBase.authCheck('/uploadStrip', req, res)) {
       return;
     }
