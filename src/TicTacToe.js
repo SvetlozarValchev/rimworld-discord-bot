@@ -1,12 +1,10 @@
 const path = require('path');
 const fs = require('fs');
-const Canvas = require('canvas');
 const Discord = require('discord.js');
 const Commands = require('./Commands');
+const { createCanvas, loadImage } = require('canvas');
 
-const Image = Canvas.Image;
 const IMG_PATH = path.join(__dirname, '..', 'assets', 'tictactoe');
-const MentionRegex = new RegExp(/\<@!?([0-9]+)\>/);
 
 const images = {
   bg: {
@@ -57,7 +55,7 @@ class TicTacToe {
     /**
      * @type {canvas.Canvas}
      */
-    this.canvas = new Canvas(150, 150);
+    this.canvas = createCanvas(150, 150);
 
     /**
      * @type {*}
@@ -110,11 +108,15 @@ class TicTacToe {
   }
 
   static preload() {
-    Object.keys(images).forEach((key) => {
-      images[key].image = new Image;
+    const promises = [];
 
-      images[key].image.src = fs.readFileSync(path.join(IMG_PATH, images[key].filename));
+    Object.keys(images).forEach((key) => {
+      promises.push(loadImage(path.join(IMG_PATH, images[key].filename)).then((image) => {
+        images[key].image = image;
+      }));
     });
+
+    return promises;
   }
 
   static get tile() {
@@ -224,25 +226,48 @@ class TicTacToe {
   static play(manager, message, args = []) {
     const player = Commands.getNickname(message);
     const playerID = message.author.id;
-    const opponentVanilla = args.join(" ");
-    if (!opponentVanilla) {
+    const opponentName = args.join(" ");
+    let opponent, opponentID, opponentMember;
+
+    // No opponent name specified
+    if (!opponentName) {
       return Commands.sendError(message, 'You must type your opponent.');
     }
 
-    if (MentionRegex.test(opponentVanilla)) {
-      const id = opponentVanilla.match(MentionRegex)[1];
-      const member = message.channel.members.find('id', id);
+    // Extract opponent from mention
+    const opponentMention = message.mentions.users.first();
 
-      var opponent = member.nickname || member.user && member.user.username;
-      var opponentID = member.id;
-    }
-    if (!opponent) {
-      let multipleCheck = Commands.nickToUser(message, opponentVanilla);
-      if (!multipleCheck) {
-        return Commands.sendError(message, 'There is multiple people with the same username or nickname');
+    if (opponentMention) {
+      opponentMember = message.channel.members.find('id', opponentMention.id);
+
+      opponent = opponentMember.nickname || opponentMember.user && opponentMember.user.username;
+      opponentID = opponentMember.id;
+    } else {
+      // Extract opponent from nickname
+      opponentMember = message.channel.members.find('nickname', opponentName);
+
+      if(opponentMember) {
+        opponent = opponentMember.nickname;
+      } else {
+        // Extract opponent from username
+        message.channel.members.find((member) => {
+          if(member.user.username === opponentName) {
+            opponentMember = member;
+          }
+        });
+
+        if(opponentMember) {
+          opponent = opponentMember.user.username;
+        }
       }
-      var opponent = multipleCheck.id;
+
+      if (!opponentMember) {
+        return Commands.sendError(message, 'No member with that name found');
+      } else {
+        opponentID = opponentMember.user.id;
+      }
     }
+
     if (opponentID === playerID) {
       return Commands.sendError(message, 'You can\'t challenge yourself.');
     }
@@ -259,11 +284,11 @@ class TicTacToe {
     if (TicTacToe.hasInstance(playerID)) {
       const instance = TicTacToe.getInstance(playerID);
 
-      //if (instance.winType > 0) {
-      //  TicTacToe.deleteInstance(playerID);
-      // } else {
+      if (instance.winType > 0) {
+       TicTacToe.deleteInstance(playerID);
+      } else {
         return Commands.sendError(message, 'You already have an active game; Type `!ttt stop` to stop it.');
-      // }
+      }
     }
 
     const instance = new TicTacToe(playerID, player, opponent, opponentID);
@@ -273,15 +298,6 @@ class TicTacToe {
     return Commands.sendSuccess(message, 'Game started. Set a position with `!ttt set [positions]`').then(() => {
       TicTacToe.show(manager, message, args);
     });
-  }
-
-  /**
-   * @param {Manager} manager
-   * @param {Message} message
-   * @param {Array} args
-   */
-  static playSuccess(manager, message, args = []) {
-
   }
 
   /**

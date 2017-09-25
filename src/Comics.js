@@ -1,9 +1,8 @@
 const path = require('path');
 const fs = require('fs');
-const Canvas = require('canvas');
 const Discord = require('discord.js');
+const { createCanvas, loadImage } = require('canvas');
 
-const Image = Canvas.Image;
 const IMG_PATH = path.join(__dirname, '..', 'assets', 'comics');
 const types = {
   begin: 'begin',
@@ -30,14 +29,6 @@ const lastComic = {
 };
 
 const Comics = {
-  stripImage(filename, type) {
-    const img = new Image();
-
-    img.src = fs.readFileSync(path.join(IMG_PATH, type, filename));
-
-    return img;
-  },
-
   drawRandomImage(ctx, type) {
     const filename = comicStrips[type][Math.floor(Math.random()*comicStrips[type].length)];
 
@@ -45,11 +36,11 @@ const Comics = {
   },
 
   drawImage(filename, ctx, type) {
-    const img = Comics.stripImage(filename, type);
+    const imgPath = path.join(IMG_PATH, type, filename);
 
-    ctx.drawImage(img, offsets[type].x, offsets[type].y, img.width, img.height);
-
-    return filename;
+    return loadImage(imgPath).then((image) => {
+      ctx.drawImage(image, offsets[type].x, offsets[type].y, image.width, image.height);
+    }).then(() => filename);
   },
 
   fetchStrips() {
@@ -71,48 +62,55 @@ const Comics = {
   },
 
   reroll(message, args) {
-    const panelNum = parseInt(args[0]);
-    const canvas = new Canvas(600, 200);
+    const canvas = createCanvas(600, 200);
     const ctx = canvas.getContext('2d');
+    let [panelFirst, panelSecond] = args;
+
+    panelFirst = parseInt(panelFirst, 10);
+    panelSecond = parseInt(panelSecond, 10);
+
+    if(panelFirst < 1 || panelFirst > 3 || (panelSecond && (panelSecond < 1 || panelSecond > 3))) return;
 
     Comics.fetchStrips();
 
-    if(panelNum === 1) {
-      lastComic.begin = Comics.drawRandomImage(ctx, types.begin);
-      lastComic.middle = Comics.drawImage(lastComic.middle, ctx, types.middle);
-      lastComic.end = Comics.drawImage(lastComic.end, ctx, types.end);
-    } else if(panelNum === 2) {
-      lastComic.begin = Comics.drawImage(lastComic.begin,ctx, types.begin);
-      lastComic.middle = Comics.drawRandomImage(ctx, types.middle);
-      lastComic.end = Comics.drawImage(lastComic.end, ctx, types.end);
-    } else if(panelNum === 3) {
-      lastComic.begin = Comics.drawImage(lastComic.begin, ctx, types.begin);
-      lastComic.middle = Comics.drawImage(lastComic.middle, ctx, types.middle);
-      lastComic.end = Comics.drawRandomImage(ctx, types.end);
-    } else {
-      return;
-    }
+    const begin = panelFirst === 1 || panelSecond === 1 ? Comics.drawRandomImage(ctx, types.begin) : Comics.drawImage(lastComic.begin,ctx, types.begin);
+    const middle = panelFirst === 2 || panelSecond === 2 ? Comics.drawRandomImage(ctx, types.middle) : Comics.drawImage(lastComic.middle, ctx, types.middle);
+    const end = panelFirst === 3 || panelSecond === 3 ? Comics.drawRandomImage(ctx, types.end) : Comics.drawImage(lastComic.end, ctx, types.end);
 
-    return message.channel.send('', new Discord.Attachment(canvas.toBuffer()));
+    return Promise.all([
+      begin,
+      middle,
+      end
+    ]).then((lastComics) => {
+      [lastComic.begin, lastComic.middle, lastComic.end] = lastComics;
+
+      return message.channel.send('', new Discord.Attachment(canvas.toBuffer(), 'comic.png'));
+    })
   },
 
   random(message, args) {
-    const canvas = new Canvas(600, 200);
+    const canvas = createCanvas(600, 200);
     const ctx = canvas.getContext('2d');
 
     Comics.fetchStrips();
 
-    lastComic.begin = Comics.drawRandomImage(ctx, types.begin);
-    lastComic.middle = Comics.drawRandomImage(ctx, types.middle);
-    lastComic.end = Comics.drawRandomImage(ctx, types.end);
+    const begin = Comics.drawRandomImage(ctx, types.begin);
+    const middle = Comics.drawRandomImage(ctx, types.middle);
+    const end = Comics.drawRandomImage(ctx, types.end);
 
-    return message.channel.send('', new Discord.Attachment(canvas.toBuffer(), 'comic.png'));
+    return Promise.all([
+      begin,
+      middle,
+      end
+    ]).then((lastComics) => {
+      [lastComic.begin, lastComic.middle, lastComic.end] = lastComics;
+
+      return message.channel.send('', new Discord.Attachment(canvas.toBuffer(), 'comic.png'));
+    })
   },
 
   comic(message, args) {
-    const [panelNum] = args;
-
-    if(!panelNum) {
+    if(args.length === 0) {
       return Comics.random(message, args);
     } else {
       return Comics.reroll(message, args);

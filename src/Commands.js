@@ -91,27 +91,6 @@ class Commands {
   }
 
   /**
-   * @param {Message} message
-   * @param {string} nickname
-   * @returns {boolean|GuildMember}
-   */
-  static nickToUser(message, nickname) {
-    if (!message.guild) {
-      return message.author;
-    }
-    let matchingUsers = {};
-    for(let i=0; i === message.guild.members.size; i++) {
-      if (message.guild.members[i].nickname === nickname || message.guild.members[i] === nickname) {
-        matchingUsers.push(message.guild.members[i]);
-      }
-    }
-    if (matchingUsers.size !== 1) {
-      return false;
-    }
-    return matchingUsers[0];
-  }
-
-  /**
    * @param {Manager} manager
    * @param {Message} message
    * @param {Array} args
@@ -382,6 +361,10 @@ class Commands {
    * @param {Array} args
    */
   static abandonSettlement(manager, message, args = []) {
+    if(!manager.hasColonist(message.author.id)) {
+      return Commands.noColonistMessage(message, 'Abandon');
+    }
+
     const colonist = manager.getColonist(message.author.id);
 
     if (!colonist.hasSettlement()) {

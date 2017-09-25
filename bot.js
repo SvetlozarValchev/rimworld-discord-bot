@@ -25,16 +25,8 @@ client.on('ready', (evt) => {
 });
 
 client.on("message", /** @type {Message} */ (message) => {
-  if (message.author.bot) {
-    return;
-  } // Ignore bots.
-  // if (message.channel.name !== "my-secret-dev-channel") {
-  //   return;
-  // } // Only certain channel
-
-  if (message.content.substring(0, 1) !== '!') {
-    return;
-  } // Only messages that start with '!'
+  if (message.author.bot) return;
+  if (message.content.substring(0, 1) !== '!') return;
 
   let args = message.content.substring(1).split(' ');
   const cmd = args[0];
@@ -42,6 +34,7 @@ client.on("message", /** @type {Message} */ (message) => {
   args = args.splice(1);
 
   switch (cmd) {
+    case 'say': message.channel.send(args.join(" ")); break;
     case 'ping': message.channel.send('Pong!'); break;
     case 'stats': Commands.showStats(manager, message, args); break;
     case 'join': Commands.addColonist(manager, message, args); break;
@@ -87,9 +80,8 @@ Promise.resolve()
   .then(() => load());
 
 function init() {
-  TicTacToe.preload();
-
   return Promise.resolve()
+    .then(() => TicTacToe.preload())
     .then(() => db.run("CREATE TABLE IF NOT EXISTS colonists (userId TEXT, username TEXT, data TEXT)"))
     .catch(err => console.error(err.stack))
     .then(() => db.run("CREATE TABLE IF NOT EXISTS settlements (name TEXT, data TEXT)"))
