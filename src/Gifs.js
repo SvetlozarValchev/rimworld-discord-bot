@@ -41,7 +41,11 @@ const Gifs = {
 
     Gifs.fetch();
 
-    if(!lastName || !name || !gifCollection[name]) {
+    if(!lastName && !name) {
+      name = Gifs.randomName();
+    }
+
+    if(!name || !gifCollection[name]) {
       name = Gifs.randomName();
     }
 
