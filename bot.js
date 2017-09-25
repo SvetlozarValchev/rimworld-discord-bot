@@ -86,8 +86,6 @@ function init() {
     .catch(err => console.error(err.stack))
     .then(() => db.run("CREATE TABLE IF NOT EXISTS settlements (name TEXT, data TEXT)"))
     .catch(err => console.error(err.stack))
-    .then(() => db.run("CREATE TABLE IF NOT EXISTS comics (name TEXT, data TEXT)"))
-    .catch(err => console.error(err.stack))
 }
 
 /**
