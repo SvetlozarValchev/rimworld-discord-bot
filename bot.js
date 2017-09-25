@@ -34,7 +34,6 @@ client.on("message", /** @type {Message} */ (message) => {
   args = args.splice(1);
 
   switch (cmd) {
-    case 'say': message.channel.send(args.join(" ")); break;
     case 'ping': message.channel.send('Pong!'); break;
     case 'stats': Commands.showStats(manager, message, args); break;
     case 'join': Commands.addColonist(manager, message, args); break;
