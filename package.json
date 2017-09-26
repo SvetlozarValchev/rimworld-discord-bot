@@ -23,7 +23,9 @@
     "express": "^4.15.4",
     "express-session": "^1.15.5",
     "formidable": "^1.1.1",
+    "gifencoder": "^1.1.0",
     "mv": "^2.1.1",
+    "readable-stream": "^2.3.3",
     "sqlite": "^2.8.0",
     "unique-slug": "^2.0.0"
   }

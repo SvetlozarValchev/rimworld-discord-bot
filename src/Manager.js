@@ -2,6 +2,21 @@ const Settlement = require('./entities/Settlement');
 const Colonist = require('./entities/Colonist');
 
 class Manager {
+  /**
+   * @typedef {Object} ColonistSerialized
+   *
+   * @property {string} userId
+   * @property {string} username
+   * @property {string} data
+   */
+
+  /**
+   * @typedef {Object} SettlementSerialized
+   *
+   * @property {string} name
+   * @property {string} data
+   */
+
   constructor(db) {
     this.db = db;
 
@@ -72,6 +87,23 @@ class Manager {
    */
   getSettlement(name) {
     return this.settlements[name];
+  }
+
+
+  /**
+   * @param {string} name
+   * @returns {Array}
+   */
+  getSettlementColonists(name) {
+    const colonists = [];
+
+    Object.keys(this.colonists).forEach((key) => {
+      if (this.colonists[key].settlement === name) {
+        colonists.push(`\`${this.colonists[key].nickname}\``);
+      }
+    });
+
+    return colonists;
   }
 
   /**

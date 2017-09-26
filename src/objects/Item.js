@@ -1,9 +1,12 @@
+const path = require('path');
+const ItemData = require('../../data/items');
+
 class Item {
   constructor() {
     /**
-     * @type {Item.Name}
+     * @type {string}
      */
-    this.name = Item.Name.None;
+    this.name = '';
 
     /**
      * @type {Item.Quality}
@@ -14,20 +17,11 @@ class Item {
      * @type {number}
      */
     this.amount = 1;
-  }
 
-  /**
-   * @enum
-   * @returns {Object}
-   */
-  static get Name() {
-    return {
-      None: 'None',
-      Lumber: 'Lumber',
-      Stone: 'Stone',
-      Cloth: 'Cloth',
-      Component: 'Component',
-    }
+    /**
+     * @type {number}
+     */
+    this.condition = 100;
   }
 
   /**
@@ -61,10 +55,15 @@ class Item {
     this.name = item.name;
     this.quality = item.quality;
     this.amount = item.amount;
+    this.condition = item.condition;
   }
 
   addAmount(amount) {
     this.amount += amount;
+  }
+
+  getImagePath() {
+    return path.join(__dirname, '..', '..', 'assets', 'game', ItemData[this.name].image + '.png');
   }
 }
 

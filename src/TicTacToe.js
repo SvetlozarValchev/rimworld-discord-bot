@@ -186,11 +186,10 @@ class TicTacToe {
   }
 
   /**
-   * @param {Manager} manager
    * @param {Message} message
    * @param {Array} args
    */
-  static help(manager, message, args = []) {
+  static help(message, args = []) {
     const commands = [
       '`!ttt help` - This help',
       '`!ttt play [opponent]` - Play against opponent',
@@ -202,11 +201,10 @@ class TicTacToe {
   }
 
   /**
-   * @param {Manager} manager
    * @param {Message} message
    * @param {Array} args
    */
-  static stop(manager, message, args = []) {
+  static stop(message, args = []) {
     const nameID = message.author.id;
 
     if (!TicTacToe.hasInstance(nameID)) {
@@ -219,11 +217,10 @@ class TicTacToe {
   }
 
   /**
-   * @param {Manager} manager
    * @param {Message} message
    * @param {Array} args
    */
-  static play(manager, message, args = []) {
+  static play(message, args = []) {
     const player = Commands.getNickname(message);
     const playerID = message.author.id;
     const opponentName = args.join(" ");
@@ -296,31 +293,29 @@ class TicTacToe {
     instances.push(instance);
 
     return Commands.sendSuccess(message, 'Game started. Set a position with `!ttt set [positions]`').then(() => {
-      TicTacToe.show(manager, message, args);
+      TicTacToe.show(message, args);
     });
   }
 
   /**
-   * @param {Manager} manager
    * @param {Message} message
    * @param {Array} args
    */
-  static show(manager, message, args = []) {
+  static show(message, args = []) {
     if (!TicTacToe.hasInstance(message.author.id)) {
       return Commands.sendError(message, 'You don\'t have an active game; Type `!ttt help`');
     }
 
     const instance = TicTacToe.getInstance(message.author.id);
 
-    return instance.beforeDraw(manager, message, args);
+    return instance.beforeDraw(message, args);
   }
 
   /**
-   * @param {Manager} manager
    * @param {Message} message
    * @param {Array} args
    */
-  static set(manager, message, args = []) {
+  static set(message, args = []) {
     if (!TicTacToe.hasInstance(message.author.id)) {
       return Commands.sendError(message, 'You don\'t have an active game; Type `!ttt help`');
     }
@@ -378,7 +373,7 @@ class TicTacToe {
       instance.toggleTurn();
     }
 
-    return instance.beforeDraw(manager, message, args);
+    return instance.beforeDraw(message, args);
   }
 
   /**
@@ -412,15 +407,14 @@ class TicTacToe {
   }
 
   /**
-   * @param {Manager} manager
    * @param {Message} message
    * @param {Array} args
    */
-  beforeDraw(manager, message, args) {
+  beforeDraw(message, args) {
     if (this.previousMessage) {
-      return this.previousMessage.delete().then(() => this.draw(manager, message, args));
+      return this.previousMessage.delete().then(() => this.draw(message, args));
     } else {
-      return this.draw(manager, message, args);
+      return this.draw(message, args);
     }
   }
 
@@ -493,11 +487,10 @@ class TicTacToe {
   }
 
   /**
-   * @param {Manager} manager
    * @param {Message} message
    * @param {Array} args
    */
-  draw(manager, message, args) {
+  draw(message, args) {
     let img;
     let title;
     let winLine = {

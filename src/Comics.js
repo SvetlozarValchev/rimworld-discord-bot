@@ -2,6 +2,8 @@ const path = require('path');
 const fs = require('fs');
 const Discord = require('discord.js');
 const { createCanvas, loadImage } = require('canvas');
+const GIFEncoder = require('gifencoder');
+const WriteMemoryStream = require('./modules/WriteMemoryStream');
 
 const IMG_PATH = path.join(__dirname, '..', 'assets', 'comics');
 const types = {
@@ -115,6 +117,44 @@ const Comics = {
     } else {
       return Comics.reroll(message, args);
     }
+  },
+
+  generateComicGif(message, args) {
+    const canvas = createCanvas(600, 200);
+    const ctx = canvas.getContext('2d');
+    const encoder = new GIFEncoder(600, 200);
+    const writeStream = new WriteMemoryStream();
+    let drawsLeft = args[0] && args[0] < 20 ? args[0] : 15;
+
+    Comics.fetchStrips();
+
+    encoder.start();
+    encoder.setRepeat(0);   // 0 for repeat, -1 for no-repeat
+    encoder.setDelay(500);  // frame delay in ms
+    encoder.setQuality(10); // image quality. 10 is default.
+    encoder.createReadStream().pipe(writeStream);
+
+    writeStream.on('finish', function () {
+      message.channel.send('', new Discord.Attachment(writeStream.getMemoryBuffer(), 'comic.gif'))
+    });
+
+    function draw() {
+      return Promise.all([
+        Comics.drawRandomImage(ctx, types.begin),
+        Comics.drawRandomImage(ctx, types.middle),
+        Comics.drawRandomImage(ctx, types.end)
+      ]).then(() => {
+        encoder.addFrame(ctx);
+
+        if(--drawsLeft > 0) {
+          return draw();
+        } else {
+          encoder.finish();
+        }
+      })
+    }
+
+    draw();
   }
 };
 

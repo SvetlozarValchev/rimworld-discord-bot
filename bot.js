@@ -2,28 +2,29 @@ const db = require('sqlite');
 const Discord = require('discord.js');
 
 const auth = require('./auth.json');
-const Manager = require('./src/Manager');
-const Commands = require('./src/Commands');
-const TicTacToe = require('./src/TicTacToe');
 const HttpServer = require('./src/Server');
+const Game = require('./src/Game');
+const TicTacToe = require('./src/TicTacToe');
 const Comics = require('./src/Comics');
 const Gifs = require('./src/Gifs');
-
-// Initialize
-const manager = new Manager(db);
-
-// Start server
-HttpServer.start();
 
 // Bot Client
 const client = new Discord.Client();
 
-client.on('ready', (evt) => {
+/** @type {Game} */
+let game;
+
+// Run server
+HttpServer.start();
+
+// On ready
+client.on('ready', () => {
   console.info('Connected');
   console.info('Logged in as: ');
   console.info(client.user.username + ' - (' + client.user.id + ')');
 });
 
+// On Message Received
 client.on("message", /** @type {Message} */ (message) => {
   if (message.author.bot) return;
   if (message.content.substring(0, 1) !== '!') return;
@@ -35,30 +36,25 @@ client.on("message", /** @type {Message} */ (message) => {
 
   switch (cmd) {
     case 'ping': message.channel.send('Pong!'); break;
-    case 'stats': Commands.showStats(manager, message, args); break;
-    case 'join': Commands.addColonist(manager, message, args); break;
-    case 'colonists': Commands.showColonists(manager, message, args); break;
-    case 'colonist': Commands.showColonist(manager, message, args); break;
-    case 'inventory': Commands.showInventory(manager, message, args); break;
-    case 'settle': Commands.addSettlement(manager, message, args); break;
-    case 'settlements': Commands.showSettlements(manager, message, args); break;
-    case 'settlement': Commands.showSettlement(manager, message, args); break;
-    case 'abandon': Commands.abandonSettlement(manager, message, args); break;
-    case 'actions': {
-      const cmd2 = args[0];
-      args = args.splice(1);
-      break;
-    }
+    case 'join': game.join(message, args); break;
+    case 'stats': game.stats(message, args); break;
+    case 'inventory': game.inventory(message, args); break;
+    case 'colonists': game.colonists(message, args); break;
+    case 'settle': game.settle(message, args); break;
+    case 'settlement': game.settlement(message, args); break;
+    case 'settlements': game.settlements(message, args); break;
+    case 'abandon': game.abandon(message, args); break;
+    case 'clearitems': game.clearItems(message, args); break;
     case 'ttt': {
       const cmd2 = args[0];
       args = args.splice(1);
 
       switch(cmd2) {
-        case 'help': TicTacToe.help(manager, message, args); break;
-        case 'play': TicTacToe.play(manager, message, args); break;
-        case 'show': TicTacToe.show(manager, message, args); break;
-        case 'set': TicTacToe.set(manager, message, args); break;
-        case 'stop': TicTacToe.stop(manager, message, args); break;
+        case 'help': TicTacToe.help(message, args); break;
+        case 'play': TicTacToe.play(message, args); break;
+        case 'show': TicTacToe.show(message, args); break;
+        case 'set': TicTacToe.set(message, args); break;
+        case 'stop': TicTacToe.stop(message, args); break;
       }
 
       break;
@@ -68,6 +64,12 @@ client.on("message", /** @type {Message} */ (message) => {
     }
     case 'gif': {
       Gifs.gif(message, args); break;
+    }
+    default: {
+      if(game.isAction(cmd)) {
+        game.action(cmd, message, args);
+        break;
+      }
     }
   }
 });
@@ -79,6 +81,8 @@ Promise.resolve()
   .then(() => load());
 
 function init() {
+  game = new Game(db);
+
   return Promise.resolve()
     .then(() => TicTacToe.preload())
     .then(() => db.run("CREATE TABLE IF NOT EXISTS colonists (userId TEXT, username TEXT, data TEXT)"))
@@ -87,27 +91,12 @@ function init() {
     .catch(err => console.error(err.stack))
 }
 
-/**
- * @typedef {Object} ColonistSerialized
- *
- * @property {string} userId
- * @property {string} username
- * @property {string} data
- */
-
-/**
- * @typedef {Object} SettlementSerialized
- *
- * @property {string} name
- * @property {string} data
- */
-
 function load() {
   return Promise.all([
     db.all('SELECT * FROM colonists')
       .then(colonists => {
         if (colonists) {
-          manager.setColonists(colonists)
+          game.manager.setColonists(colonists);
         }
       })
       .catch(console.error),
@@ -115,7 +104,7 @@ function load() {
     db.all('SELECT * FROM settlements')
       .then(settlements => {
         if (settlements) {
-          manager.setSettlements(settlements)
+          game.manager.setSettlements(settlements);
         }
       })
       .catch(console.error),
