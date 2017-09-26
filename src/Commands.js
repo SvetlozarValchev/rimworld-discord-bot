@@ -64,6 +64,10 @@ class Commands {
 
     return message.author.username;
   }
+
+  static mention(userId) {
+    return `<@${userId}>`;
+  }
 }
 
 module.exports = Commands;

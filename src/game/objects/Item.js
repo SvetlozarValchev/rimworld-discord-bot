@@ -1,5 +1,5 @@
 const path = require('path');
-const ItemData = require('../../data/items');
+const ItemData = require('../../../data/items');
 
 class Item {
   constructor() {
@@ -62,8 +62,8 @@ class Item {
     this.amount += amount;
   }
 
-  getImagePath() {
-    return path.join(__dirname, '..', '..', 'assets', 'game', ItemData[this.name].image + '.png');
+  get itemData() {
+    return ItemData[this.name];
   }
 }
 

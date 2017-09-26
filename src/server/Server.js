@@ -1,6 +1,6 @@
 const express = require('express');
 const session = require('express-session');
-const auth = require('../auth.json');
+const auth = require('../../auth.json');
 const ServiceBase = require('./services/base');
 const ServiceUploadStrips = require('./services/uploadStrips');
 const ServiceUploadGifs = require('./services/uploadGifs');

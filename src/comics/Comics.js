@@ -3,7 +3,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const { createCanvas, loadImage } = require('canvas');
 const GIFEncoder = require('gifencoder');
-const WriteMemoryStream = require('./modules/WriteMemoryStream');
+const WriteMemoryStream = require('../modules/WriteMemoryStream');
 
 const IMG_PATH = path.join(__dirname, '..', 'assets', 'comics');
 const types = {

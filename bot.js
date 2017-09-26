@@ -2,11 +2,11 @@ const db = require('sqlite');
 const Discord = require('discord.js');
 
 const auth = require('./auth.json');
-const HttpServer = require('./src/Server');
-const Game = require('./src/Game');
-const TicTacToe = require('./src/TicTacToe');
-const Comics = require('./src/Comics');
-const Gifs = require('./src/Gifs');
+const HttpServer = require('./src/server/Server');
+const Game = require('./src/game/Game');
+const TicTacToe = require('./src/tictactoe/TicTacToe');
+const Comics = require('./src/comics/Comics');
+const Gifs = require('./src/gifs/Gifs');
 
 // Bot Client
 const client = new Discord.Client();

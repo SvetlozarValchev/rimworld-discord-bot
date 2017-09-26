@@ -1,10 +1,9 @@
 const path = require('path');
-const fs = require('fs');
 const Discord = require('discord.js');
-const Commands = require('./Commands');
+const Commands = require('../Commands');
 const { createCanvas, loadImage } = require('canvas');
 
-const IMG_PATH = path.join(__dirname, '..', 'assets', 'tictactoe');
+const IMG_PATH = path.join(__dirname, '..', '..', 'assets', 'tictactoe');
 
 const images = {
   bg: {

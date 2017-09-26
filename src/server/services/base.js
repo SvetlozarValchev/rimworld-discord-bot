@@ -1,6 +1,6 @@
 const path = require('path');
 const formidable = require('formidable');
-const auth = require('../../auth.json');
+const auth = require('../../../auth.json');
 
 class ServiceBase {
   static setRoutes(app) {

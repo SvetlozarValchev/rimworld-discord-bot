@@ -1,5 +1,5 @@
 const Item = require('./Item');
-const ItemData = require('../../data/items');
+const ItemData = require('../../../data/items');
 
 class Inventory {
   constructor() {
@@ -40,16 +40,6 @@ class Inventory {
 
       this.items.push(item);
     });
-  }
-
-  getItems() {
-    const items = [];
-
-    this.items.forEach((item) => {
-      items.push(`${item.amount} ${item.name}`);
-    });
-
-    return items;
   }
 
   findItemIndex(name, quality) {

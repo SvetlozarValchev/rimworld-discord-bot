@@ -1,8 +1,9 @@
-const Commands = require('./Commands');
-const Manager = require('./Manager');
 const { createCanvas, loadImage } = require('canvas');
 const Discord = require('discord.js');
 
+const Commands = require('../Commands');
+const Manager = require('./Manager');
+const Assets = require('./Assets');
 const Colonist = require('./entities/Colonist');
 const Item = require('./objects/Item');
 
@@ -15,12 +16,15 @@ class Game {
     /**
      * @type {Object}
      */
-    this.stepInterval = setInterval(this.step.bind(this), 1000);
+    // this.stepInterval = setInterval(this.step.bind(this), 1000);
+
+    Assets.load();
   }
 
   step() {
     let addItem;
     let colonist;
+
 
     Object.keys(this.manager.colonists).forEach((key) => {
       colonist = this.manager.colonists[key];
@@ -139,16 +143,33 @@ class Game {
   inventory(message, args) {
     if(!this.isColonist(message, 'Inventory')) return;
 
+    const offsetX = 5, offsetY = 58;
     const colonist = this.manager.getColonist(message.author.id);
-    const items = colonist.inventory.getItems();
+    const items = colonist.inventory.items;
     const inventorySizeSqrt = Math.sqrt(colonist.inventory.size);
-
     const canvas = createCanvas(GRID_SIZE * inventorySizeSqrt, GRID_SIZE * inventorySizeSqrt);
     const ctx = canvas.getContext('2d');
+    let itemIdx = 0, asset, item, itemData;
 
     for(let y = 0; y < inventorySizeSqrt; y++) {
       for(let x = 0; x < inventorySizeSqrt; x++) {
-        ctx.drawImage(images[winLine.image].image, winLine.x, winLine.y, images[winLine.image].image.width, images[winLine.image].image.height);
+        if(itemIdx > items.length - 1) {
+          item = null;
+          itemData = null;
+          asset = Assets.get['items']['empty'];
+        } else {
+          item = items[itemIdx];
+          itemData = item.itemData;
+          asset = Assets.get['items'][itemData.image];
+        }
+
+        ctx.drawImage(asset, x * GRID_SIZE, y * GRID_SIZE, asset.width, asset.height);
+        itemIdx++;
+
+        if(item && itemData && itemData.maxAmount > 1) {
+          ctx.font = '12px "monospace"';
+          ctx.fillText(String(item.amount), x * GRID_SIZE + offsetX, y * GRID_SIZE + offsetY);
+        }
       }
     }
 
@@ -156,7 +177,7 @@ class Game {
       return Commands.sendEmbed(message, 'Inventory', 'Empty');
     }
 
-    return message.channel.send(title, new Discord.Attachment(canvas.toBuffer()));
+    return message.channel.send(`Your inventory, ${Commands.mention(message.author.id)}`, new Discord.Attachment(canvas.toBuffer()));
   }
 
   /**
@@ -358,7 +379,7 @@ class Game {
 
     colonist.setAction(Colonist.actions[action]);
 
-    return Commands.sendSuccess(message, `You are now a ${Colonist.profession[action]}`);
+    return Commands.sendSuccess(message, `Profession: ${Colonist.profession[action]}`);
   }
 
   clearItems(message, args) {
