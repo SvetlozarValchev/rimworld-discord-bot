@@ -1,10 +1,27 @@
 const Inventory = require('../objects/Inventory');
 
 class Colonist {
+  static get actions() {
+    return {
+      chop: 'chop',
+      mine: 'mine',
+      grow: 'grow',
+      idle: null
+    }
+  }
+
+  static get profession() {
+    return {
+      chop: 'Lumberjack',
+      mine: 'Miner',
+      grow: 'Farmer',
+      idle: 'Unemployed'
+    }
+  }
   /**
-   * @param {string} userId
-   * @param {string} username
-   * @param {string|null} nickname
+   * @param {string} [userId]
+   * @param {string} [username]
+   * @param {string|null} [nickname]
    */
   constructor(userId, username, nickname) {
     /**
@@ -26,6 +43,11 @@ class Colonist {
      * @type {string|null}
      */
     this.settlement = null;
+
+    /**
+     * @type {string|null}
+     */
+    this.action = null;
 
     /**
      * @type {Object}
@@ -71,6 +93,13 @@ class Colonist {
   }
 
   /**
+   * @param action
+   */
+  setAction(action) {
+    this.action = action;
+  }
+
+  /**
    * @returns {Object}
    */
   get() {
@@ -80,6 +109,7 @@ class Colonist {
       $data: JSON.stringify({
         nickname: this.nickname,
         settlement: this.settlement,
+        action: this.action,
         needs: this.needs,
         stats: this.stats,
         inventory: this.inventory.get()
@@ -100,8 +130,9 @@ class Colonist {
 
     this.nickname = data.nickname;
     this.settlement = data.settlement;
+    this.action = data.action;
     this.needs = data.needs;
-    this.stats = data.stats;
+    this.stats = data.info;
     this.inventory.set(data.inventory);
   }
 }

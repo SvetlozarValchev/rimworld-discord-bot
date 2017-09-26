@@ -1,0 +1,25 @@
+{
+  "silver": {
+    "name": "Silver",
+    "price": 1,
+    "maxAmount": 999
+  },
+  "wood": {
+    "name": "Wood",
+    "image": "wood",
+    "price": 1,
+    "maxAmount": 99
+  },
+  "strawberry": {
+    "name": "Strawberry",
+    "image": "strawberry",
+    "price": 1,
+    "maxAmount": 99
+  },
+  "stone": {
+    "name": "Stone",
+    "image": "stone",
+    "price": 1,
+    "maxAmount": 99
+  }
+}

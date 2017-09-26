@@ -1,19 +1,17 @@
 const Item = require('./Item');
+const ItemData = require('../../data/items');
 
 class Inventory {
   constructor() {
     /**
      * @type {number}
      */
-    this.size = 0;
+    this.size = 4;
+
     /**
      * @type {Array.<Item>}
      */
-    this.items = {};
-  }
-
-  static itemName(name, quality) {
-    return `${name}.${quality}`;
+    this.items = [];
   }
 
   /**
@@ -27,21 +25,48 @@ class Inventory {
    * @param {Object} inventory
    */
   set(inventory) {
+    let item;
+
     if (!inventory) {
       return;
     }
 
-    this.items = {};
+    this.size = inventory.size;
+    this.items = [];
 
-    Object.keys(inventory.items).forEach((key) => {
-      this.items[key] = new Item();
-      this.items[key].set(inventory.items[key]);
+    inventory.items.forEach((inventoryItem) => {
+      item = new Item();
+      item.set(inventoryItem);
+
+      this.items.push(item);
     });
   }
 
+  getItems() {
+    const items = [];
+
+    this.items.forEach((item) => {
+      items.push(`${item.amount} ${item.name}`);
+    });
+
+    return items;
+  }
+
+  findItemIndex(name, quality) {
+    let itemId = null;
+
+    this.items.forEach((item, idx) => {
+      if(item.name === name && item.quality === quality) {
+        itemId = idx;
+      }
+    });
+
+    return itemId;
+  }
+
   /**
-   * @param {Item.Name} name
-   * @param {Item.Quality} quality
+   * @param {string} name
+   * @param {string} quality
    * @param {number} amount
    */
   addItem(name, quality, amount) {
@@ -49,19 +74,36 @@ class Inventory {
       throw new Error('Amount has to be at least 1');
     }
 
-    const itemName = Inventory.itemName(name, quality);
-    let item = this.items[itemName];
+    if(!ItemData[name]) {
+      throw new Error('No item with name ' + name);
+    }
 
-    if (item) {
-      item.addAmount(amount);
+    let itemData = ItemData[name];
+    let itemIndex = this.findItemIndex(name, quality);
+    let item;
+
+    if (itemIndex !== null) {
+      item = this.items[itemIndex];
+
+      if(item.amount < itemData.maxAmount) {
+        this.items[itemIndex].addAmount(amount);
+      } else {
+        if(this.items.length < this.size) {
+          item = new Item();
+          item.set({name, quality, amount});
+
+          this.items.push(item);
+        } else {
+          return false;
+        }
+      }
     } else {
       item = new Item();
-      item.set({
-        name,
-        quality,
-        amount
-      });
+      item.set({name, quality, amount});
+      this.items.push(item);
     }
+
+    return true;
   }
 
   /**
@@ -86,6 +128,10 @@ class Inventory {
     } else {
       throw new Error('Item doesn\'t exist');
     }
+  }
+
+  clearItems() {
+    this.items = [];
   }
 }
 
