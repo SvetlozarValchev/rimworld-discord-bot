@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const Discord = require('discord.js');
 
-const IMG_PATH = path.join(__dirname, '..', 'assets', 'gifs');
+const IMG_PATH = path.join(__dirname, '..', '..', 'assets', 'gifs');
 const gifCollection = {};
 let lastName = '';
 
@@ -20,6 +20,10 @@ const Gifs = {
     return name;
   },
 
+  /**
+   * @param name
+   * @returns {string}
+   */
   randomGif(name) {
     return gifCollection[name][Math.floor(Math.random()*gifCollection[name].length)];
   },
@@ -36,6 +40,10 @@ const Gifs = {
     });
   },
 
+  /**
+   * @param {Message} message
+   * @param {Array} args
+   */
   gif(message, args) {
     let name = args[0];
 

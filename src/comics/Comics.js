@@ -5,7 +5,7 @@ const { createCanvas, loadImage } = require('canvas');
 const GIFEncoder = require('gifencoder');
 const WriteMemoryStream = require('../modules/WriteMemoryStream');
 
-const IMG_PATH = path.join(__dirname, '..', 'assets', 'comics');
+const IMG_PATH = path.join(__dirname, '..', '..', 'assets', 'comics');
 const types = {
   begin: 'begin',
   middle: 'middle',
@@ -30,22 +30,22 @@ const lastComic = {
   end: ''
 };
 
-const Comics = {
-  drawRandomImage(ctx, type) {
+class Comics {
+  static drawRandomImage(ctx, type) {
     const filename = comicStrips[type][Math.floor(Math.random()*comicStrips[type].length)];
 
     return Comics.drawImage(filename, ctx, type);
-  },
+  }
 
-  drawImage(filename, ctx, type) {
+  static drawImage(filename, ctx, type) {
     const imgPath = path.join(IMG_PATH, type, filename);
 
     return loadImage(imgPath).then((image) => {
       ctx.drawImage(image, offsets[type].x, offsets[type].y, image.width, image.height);
     }).then(() => filename);
-  },
+  }
 
-  fetchStrips() {
+  static fetchStrips() {
     comicStrips.begin = [];
     comicStrips.middle = [];
     comicStrips.end = [];
@@ -61,9 +61,9 @@ const Comics = {
     fs.readdirSync(path.join(IMG_PATH, types.end)).forEach(file => {
       comicStrips.end.push(file);
     });
-  },
+  }
 
-  reroll(message, args) {
+  static reroll(message, args) {
     const canvas = createCanvas(600, 200);
     const ctx = canvas.getContext('2d');
     let [panelFirst, panelSecond] = args;
@@ -88,9 +88,9 @@ const Comics = {
 
       return message.channel.send('', new Discord.Attachment(canvas.toBuffer(), 'comic.png'));
     })
-  },
+  }
 
-  random(message, args) {
+  static random(message, args) {
     const canvas = createCanvas(600, 200);
     const ctx = canvas.getContext('2d');
 
@@ -109,17 +109,17 @@ const Comics = {
 
       return message.channel.send('', new Discord.Attachment(canvas.toBuffer(), 'comic.png'));
     })
-  },
+  }
 
-  comic(message, args) {
+  static comic(message, args) {
     if(args.length === 0) {
       return Comics.random(message, args);
     } else {
       return Comics.reroll(message, args);
     }
-  },
+  }
 
-  generateComicGif(message, args) {
+  static generateComicGif(message, args) {
     const canvas = createCanvas(600, 200);
     const ctx = canvas.getContext('2d');
     const encoder = new GIFEncoder(600, 200);
@@ -156,6 +156,6 @@ const Comics = {
 
     draw();
   }
-};
+}
 
 module.exports = Comics;

@@ -65,6 +65,10 @@ class Commands {
     return message.author.username;
   }
 
+  /**
+   * @param {string} userId
+   * @returns {string}
+   */
   static mention(userId) {
     return `<@${userId}>`;
   }

@@ -5,6 +5,9 @@ const { createCanvas, loadImage } = require('canvas');
 
 const IMG_PATH = path.join(__dirname, '..', '..', 'assets', 'tictactoe');
 
+/**
+ * @type {{bg: {filename: string, image: null}, circle: {filename: string, image: null}, cross: {filename: string, image: null}, line_horizontal: {filename: string, image: null}, line_vertical: {filename: string, image: null}, line_diagonal_left: {filename: string, image: null}, line_diagonal_right: {filename: string, image: null}}}
+ */
 const images = {
   bg: {
     filename: 'tictactoe_bg.png',
@@ -41,6 +44,10 @@ const images = {
     image: null
   }
 };
+
+/**
+ * @type {Array.<TicTacToe>}
+ */
 const instances = [];
 
 class TicTacToe {
@@ -62,7 +69,7 @@ class TicTacToe {
     this.ctx = this.canvas.getContext('2d');
 
     /**
-     * @type {Message|null}
+     * @type {?Message}
      */
     this.previousMessage = null;
 
@@ -106,6 +113,9 @@ class TicTacToe {
     this.winType = TicTacToe.winType.none;
   }
 
+  /**
+   * @returns {Array.<Promise>}
+   */
   static preload() {
     const promises = [];
 
@@ -118,6 +128,10 @@ class TicTacToe {
     return promises;
   }
 
+  /**
+   * @readonly
+   * @enum {number}
+   */
   static get tile() {
     return {
       none: 0,
@@ -126,6 +140,10 @@ class TicTacToe {
     };
   }
 
+  /**
+   * @readonly
+   * @enum {number}
+   */
   static get winType() {
     return {
       none: 0,
@@ -159,7 +177,7 @@ class TicTacToe {
 
   /**
    * @param {string} playerID
-   * @returns {TicTacToe|null}
+   * @returns {?TicTacToe}
    */
   static getInstance(playerID) {
     let inst = null;

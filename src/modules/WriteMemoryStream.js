@@ -10,14 +10,23 @@ class WriteMemoryStream extends Writable {
     this.memoryBuffer = new Buffer('');
   }
 
-  _write(chunk, enc, cb) {
+  /**
+   * @param {Buffer|Number|Array|String} chunk
+   * @param {String?} enc
+   * @param {Function} callback
+   * @private
+   */
+  _write(chunk, enc, callback) {
     const buffer = Buffer.isBuffer(chunk) ? chunk : new Buffer(chunk, enc);
 
     this.memoryBuffer = Buffer.concat([this.memoryBuffer, buffer]);
 
-    cb();
+    callback();
   }
 
+  /**
+   * @returns {Buffer}
+   */
   getMemoryBuffer() {
     return this.memoryBuffer;
   }

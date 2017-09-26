@@ -16,7 +16,7 @@ class Game {
     /**
      * @type {Object}
      */
-    // this.stepInterval = setInterval(this.step.bind(this), 1000);
+    this.stepInterval = setInterval(this.step.bind(this), 1000);
 
     Assets.load();
   }
@@ -31,16 +31,19 @@ class Game {
 
       switch(colonist.action) {
         case Colonist.actions.chop: {
-          addItem = colonist.inventory.addItem('wood', Item.Quality.Normal, 1);
+          addItem = colonist.inventory.addItem('wood', Item.quality.Normal, 1);
           break;
         }
         case Colonist.actions.mine: {
-          addItem = colonist.inventory.addItem('stone', Item.Quality.Normal, 1);
+          addItem = colonist.inventory.addItem('stone', Item.quality.Normal, 1);
           break;
         }
         case Colonist.actions.grow: {
-          addItem = colonist.inventory.addItem('strawberry', Item.Quality.Normal, 1);
+          addItem = colonist.inventory.addItem('strawberry', Item.quality.Normal, 1);
           break;
+        }
+        default: {
+          addItem = false;
         }
       }
 
@@ -119,6 +122,10 @@ class Game {
     ]);
   }
 
+  /**
+   * @param {string} name
+   * @returns {Promise}
+   */
   settlementInfo(name) {
     const settlement = this.manager.getSettlement(name);
     const colonists = this.manager.getSettlementColonists(name);
@@ -139,6 +146,7 @@ class Game {
   /**
    * @param {Message} message
    * @param {Array} args
+   * @returns {Promise}
    */
   inventory(message, args) {
     if(!this.isColonist(message, 'Inventory')) return;
@@ -183,6 +191,7 @@ class Game {
   /**
    * @param {Message} message
    * @param {Array} args
+   * @returns {Promise}
    */
   colonists(message, args) {
     if(!this.isColonist(message, 'Colonists')) return;
@@ -200,6 +209,7 @@ class Game {
   /**
    * @param {Message} message
    * @param {Array} args
+   * @returns {Promise}
    */
   settle(message, args) {
     if(!this.isColonist(message, 'Settle')) return;
@@ -269,6 +279,7 @@ class Game {
   /**
    * @param {Message} message
    * @param {Array} args
+   * @returns {Promise}
    */
   settlement(message, args) {
     if(!this.isColonist(message, 'Settlement')) return;
@@ -295,6 +306,7 @@ class Game {
   /**
    * @param {Message} message
    * @param {Array} args
+   * @returns {Promise}
    */
   settlements(message, args) {
     if(!this.isColonist(message, 'Settlements')) return;
@@ -312,6 +324,7 @@ class Game {
   /**
    * @param {Message} message
    * @param {Array} args
+   * @returns {Promise}
    */
   abandon(message, args) {
     if(!this.isColonist(message, 'Abandon')) return;
@@ -371,6 +384,7 @@ class Game {
    * @param {string} action
    * @param {Message} message
    * @param {Array} args
+   * @returns {Promise}
    */
   action(action, message, args) {
     if(!this.isColonist(message, `Action: ${action}`)) return;
@@ -382,6 +396,10 @@ class Game {
     return Commands.sendSuccess(message, `Profession: ${Colonist.profession[action]}`);
   }
 
+  /**
+   * @param {Message} message
+   * @param {Array} args
+   */
   clearItems(message, args) {
     const colonist = this.manager.getColonist(message.author.id);
 

@@ -1,6 +1,11 @@
 const Inventory = require('../objects/Inventory');
 
 class Colonist {
+  /**
+   * @readonly
+   * @enum
+   * @returns {{chop: string, mine: string, grow: string, idle: null}}
+   */
   static get actions() {
     return {
       chop: 'chop',
@@ -10,6 +15,11 @@ class Colonist {
     }
   }
 
+  /**
+   * @readonly
+   * @enum
+   * @returns {{chop: string, mine: string, grow: string, idle: string}}
+   */
   static get profession() {
     return {
       chop: 'Lumberjack',
@@ -21,7 +31,7 @@ class Colonist {
   /**
    * @param {string} [userId]
    * @param {string} [username]
-   * @param {string|null} [nickname]
+   * @param {?string} [nickname]
    */
   constructor(userId, username, nickname) {
     /**
@@ -40,17 +50,17 @@ class Colonist {
     this.nickname = nickname;
 
     /**
-     * @type {string|null}
+     * @type {?string}
      */
     this.settlement = null;
 
     /**
-     * @type {string|null}
+     * @type {?string}
      */
     this.action = null;
 
     /**
-     * @type {Object}
+     * @type {{health: number, hunger: number, mood: number}}
      */
     this.needs = {
       health: 100,
@@ -58,6 +68,9 @@ class Colonist {
       mood: 100,
     };
 
+    /**
+     * @type {{combat: number, social: number, medicine: number, cooking: number, construction: number, growing: number, mining: number, artistic: number, crafting: number, research: number, carryCapacity: number}}
+     */
     this.stats = {
       combat: 0,
       social: 0,
@@ -86,7 +99,7 @@ class Colonist {
   }
 
   /**
-   * @param {string|null} settlement
+   * @param {?string} settlement
    */
   setSettlement(settlement) {
     this.settlement = settlement;

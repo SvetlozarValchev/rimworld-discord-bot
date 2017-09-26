@@ -9,9 +9,9 @@ class Item {
     this.name = '';
 
     /**
-     * @type {Item.Quality}
+     * @type {Item.quality}
      */
-    this.quality = Item.Quality.None;
+    this.quality = Item.quality.None;
 
     /**
      * @type {number}
@@ -25,10 +25,11 @@ class Item {
   }
 
   /**
+   * @readonly
    * @enum
-   * @returns {Object}
+   * @returns {{None: string, Bad: string, Normal: string, Superior: string}}
    */
-  static get Quality() {
+  static get quality() {
     return {
       None: 'none',
       Bad: 'bad',
@@ -58,10 +59,16 @@ class Item {
     this.condition = item.condition;
   }
 
+  /**
+   * @param {string} amount
+   */
   addAmount(amount) {
     this.amount += amount;
   }
 
+  /**
+   * @returns {{}}
+   */
   get itemData() {
     return ItemData[this.name];
   }

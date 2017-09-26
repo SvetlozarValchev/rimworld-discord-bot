@@ -11,6 +11,10 @@ class Assets {
     Assets.traverse(ASSET_PATH, assetsCollection);
   }
 
+  /**
+   * @param {string} assetPath
+   * @param {{}} objRef
+   */
   static traverse(assetPath, objRef) {
     fs.readdirSync(assetPath).forEach((source) => {
       const sourcePath = path.join(assetPath, source);
@@ -33,6 +37,9 @@ class Assets {
     });
   }
 
+  /**
+   * @returns {{}}
+   */
   static get get() {
     return assetsCollection;
   }

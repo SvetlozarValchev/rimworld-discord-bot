@@ -42,6 +42,11 @@ class Inventory {
     });
   }
 
+  /**
+   * @param {string} name
+   * @param {string} quality
+   * @returns {?number}
+   */
   findItemIndex(name, quality) {
     let itemId = null;
 
@@ -98,7 +103,7 @@ class Inventory {
 
   /**
    * @param {Item.Name} name
-   * @param {Item.Quality} quality
+   * @param {Item.quality} quality
    * @param {number} amount
    */
   removeItem(name, quality, amount) {
