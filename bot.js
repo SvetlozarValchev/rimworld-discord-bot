@@ -45,6 +45,7 @@ client.on("message", /** @type {Message} */ (message) => {
     case 'settlements': game.settlements(message, args); break;
     case 'abandon': game.abandon(message, args); break;
     case 'clearitems': game.clearItems(message, args); break;
+    case 'tiles': game.tiles(message, args); break;
     case 'ttt': {
       const cmd2 = args[0];
       args = args.splice(1);

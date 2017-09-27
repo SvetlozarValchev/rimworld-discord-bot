@@ -26,6 +26,7 @@
     "gifencoder": "^1.1.0",
     "mv": "^2.1.1",
     "readable-stream": "^2.3.3",
+    "socket.io": "^2.0.3",
     "sqlite": "^2.8.0",
     "unique-slug": "^2.0.0"
   }

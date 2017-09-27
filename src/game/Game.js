@@ -1,13 +1,14 @@
 const { createCanvas, loadImage } = require('canvas');
 const Discord = require('discord.js');
 
+const GameServer = require('./GameServer');
 const Commands = require('../Commands');
 const Manager = require('./Manager');
 const Assets = require('./Assets');
 const Colonist = require('./entities/Colonist');
 const Item = require('./objects/Item');
 
-const GRID_SIZE = 64;
+const GRID_SIZE = 32;
 
 class Game {
   constructor(db) {
@@ -19,6 +20,8 @@ class Game {
     this.stepInterval = setInterval(this.step.bind(this), 1000);
 
     Assets.load();
+
+    GameServer.start();
   }
 
   step() {
@@ -404,6 +407,44 @@ class Game {
     const colonist = this.manager.getColonist(message.author.id);
 
     colonist.inventory.clearItems();
+  }
+
+  /**
+   * @param {Message} message
+   * @param {Array} args
+   */
+  tiles(message, args) {
+    const w = 24;
+    const h = 24;
+    const offset = 20;
+    const totalWidth = GRID_SIZE * w + offset;
+    const totalHeight = GRID_SIZE * h + offset;
+    const canvas = createCanvas(totalWidth, totalWidth);
+    const ctx = canvas.getContext('2d');
+    const topLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    // const map =
+    let x, y, asset;
+
+    ctx.font = '12px "Verdana"';
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, totalWidth, totalHeight);
+    ctx.fillStyle = '#DDDDDD';
+
+    for(y = 0; y < h; y++) {
+      for(x = 0; x < w; x++) {
+        asset = Assets.get['grass2'];
+
+        ctx.drawImage(asset, x * GRID_SIZE + offset, y * GRID_SIZE + offset, asset.width, asset.height);
+      }
+
+      ctx.fillText(String(y + 1), 3, y * GRID_SIZE + offset + 19);
+    }
+
+    for(x = 0; x < w; x++) {
+      ctx.fillText(topLetters[x], x * GRID_SIZE + offset + 11, 16);
+    }
+
+    return message.channel.send(w + 'x' + h, { files: [new Discord.Attachment(canvas.toBuffer(), 'tiles.png')] });
   }
 }
 
