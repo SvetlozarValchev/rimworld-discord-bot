@@ -129,26 +129,61 @@ function draw() {
   drawCharacter();
 
   if(isDrawing) {
-    window.requestAnimationFrame(draw);
+    animationFrame(draw);
   }
+}
+
+var lastTime = 0;
+
+function animationFrame(callback, element) {
+    var currTime = new Date().getTime();
+    var timeToCall = Math.max(0, 24 - (currTime - lastTime));
+    var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+      timeToCall);
+    lastTime = currTime + timeToCall;
+    return id;
 }
 
 function clearCanvas() {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
+function isVisible(x, y, width, height) {
+  if(x + width > 0 && x < ctx.canvas.width &&
+     y + height > 0 && y < ctx.canvas.height) {
+    return true;
+  }
+}
+
 function drawIsometric() {
   var startingPoint = {x: 600, y: 20};
   var size = 42;
   var rowLength = 1;
-  var y, j;
-  var side = 25;
+  var y, j, posX, posY, width, height;
+  var side = 250;
   var row = 1;
 
   for(y = 0; y < side; y++) {
     j = 0;
     while(j < rowLength) {
-      ctx.drawImage(assets['cube'], worldOffset.x + startingPoint.x + j * size - rowLength * size / 2, worldOffset.y + startingPoint.y + row * size * 0.25, assets['cube'].width, assets['cube'].height);
+      // posX = worldOffset.x + startingPoint.x + j * size - rowLength * size / 2;
+      // posY = worldOffset.y + startingPoint.y + row * size * 0.25;
+      // width = assets['cube'].width;
+      // height = assets['cube'].height;
+      //
+      // if(isVisible(posX, posY, width, height)) {
+      //   ctx.drawImage(assets['cube'], posX, posY, width, height);
+      // }
+
+      posX = worldOffset.x + startingPoint.x + j * size - rowLength * size / 2;
+      posY = worldOffset.y + startingPoint.y + row * size * 0.25 - 32;
+      width = assets['grass'].width;
+      height = assets['grass'].height;
+
+      if(isVisible(posX, posY, width, height)) {
+        ctx.drawImage(assets['grass'], posX, posY, width, height);
+      }
+
       j++;
     }
 
@@ -158,32 +193,25 @@ function drawIsometric() {
 
   for(y = side; y >= 0; y--) {
     j = 0;
-    while(j < rowLength) {
-      ctx.drawImage(assets['cube'], worldOffset.x + startingPoint.x + j * size - rowLength * size / 2, worldOffset.y + startingPoint.y + row * size * 0.25, assets['cube'].width, assets['cube'].height);
-      j++;
-    }
+    while (j < rowLength) {
+      // posX = worldOffset.x + startingPoint.x + j * size - rowLength * size / 2;
+      // posY = worldOffset.y + startingPoint.y + row * size * 0.25;
+      // width = assets['cube'].width;
+      // height = assets['cube'].height;
+      //
+      // if (isVisible(posX, posY, width, height)) {
+      //   ctx.drawImage(assets['cube'], posX, posY, width, height);
+      // }
 
-    row++;
-    rowLength--;
-  }
+      posX = worldOffset.x + startingPoint.x + j * size - rowLength * size / 2;
+      posY = worldOffset.y + startingPoint.y + row * size * 0.25 - 32;
+      width = assets['grass'].width;
+      height = assets['grass'].height;
 
-  row = 1;
+      if (isVisible(posX, posY, width, height)) {
+        ctx.drawImage(assets['grass'], posX, posY, width, height);
+      }
 
-  for(y = 0; y < side; y++) {
-    j = 0;
-    while(j < rowLength) {
-      ctx.drawImage(assets['grass'], worldOffset.x + startingPoint.x + j * size - rowLength * size / 2, worldOffset.y + startingPoint.y + row * size * 0.25 - 32, assets['cube'].width, assets['cube'].height);
-      j++;
-    }
-
-    row++;
-    rowLength++;
-  }
-
-  for(y = side; y >= 0; y--) {
-    j = 0;
-    while(j < rowLength) {
-      ctx.drawImage(assets['grass'], worldOffset.x + startingPoint.x + j * size - rowLength * size / 2, worldOffset.y + startingPoint.y + row * size * 0.25 - 32, assets['cube'].width, assets['cube'].height);
       j++;
     }
 
@@ -224,6 +252,6 @@ function drawIsometric() {
 
 function drawCharacter() {
   for(var key in characters) {
-    ctx.drawImage(assets['character'], characters[key].x, characters[key].y, assets['character'].width, assets['character'].height);
+    ctx.drawImage(assets['character'], worldOffset.x + characters[key].x, worldOffset.y + characters[key].y, assets['character'].width, assets['character'].height);
   }
 }
