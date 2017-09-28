@@ -7,16 +7,16 @@ const Assets = require('./Assets');
 const Colonist = require('./entities/Colonist');
 const Item = require('./objects/Item');
 
-const GRID_SIZE = 64;
-
 class Game {
-  constructor(db) {
+  constructor(db, client) {
     this.manager = new Manager(db);
+
+    this.client = client;
 
     /**
      * @type {Object}
      */
-    this.stepInterval = setInterval(this.step.bind(this), 1000);
+    this.stepInterval = setInterval(this.step.bind(this), 10000);
 
     Assets.load();
   }
@@ -25,9 +25,13 @@ class Game {
     let addItem;
     let colonist;
 
-
     Object.keys(this.manager.colonists).forEach((key) => {
       colonist = this.manager.colonists[key];
+
+      const user = this.client.users.find('id', colonist.userId);
+      if(!user || !user.presence || user.presence.status !== 'online') {
+        return;
+      }
 
       switch(colonist.action) {
         case Colonist.actions.chop: {
@@ -39,7 +43,7 @@ class Game {
           break;
         }
         case Colonist.actions.grow: {
-          addItem = colonist.inventory.addItem('strawberry', Item.quality.Normal, 1);
+          addItem = colonist.inventory.addItem('berries', Item.quality.Normal, 1);
           break;
         }
         default: {
@@ -123,13 +127,15 @@ class Game {
   }
 
   /**
-   * @param {string} name
+   * @param {Message} message
+   * @param {Array} args
    * @returns {Promise}
    */
-  settlementInfo(name) {
+  settlementInfo(message, args) {
+    const name = args[0];
     const settlement = this.manager.getSettlement(name);
     const colonists = this.manager.getSettlementColonists(name);
-    const items = settlement.inventory.getItems();
+    const items = settlement.inventory.items;
 
     return Commands.sendEmbed(message, `Settlement ${name}`, '.', [
       {
@@ -151,41 +157,12 @@ class Game {
   inventory(message, args) {
     if(!this.isColonist(message, 'Inventory')) return;
 
-    const offsetX = 5, offsetY = 58;
     const colonist = this.manager.getColonist(message.author.id);
-    const items = colonist.inventory.items;
-    const inventorySizeSqrt = Math.sqrt(colonist.inventory.size);
-    const canvas = createCanvas(GRID_SIZE * inventorySizeSqrt, GRID_SIZE * inventorySizeSqrt);
-    const ctx = canvas.getContext('2d');
-    let itemIdx = 0, asset, item, itemData;
+    const inventoryCanvas = colonist.inventory.draw();
+    // console.log(user.presence.status);
 
-    for(let y = 0; y < inventorySizeSqrt; y++) {
-      for(let x = 0; x < inventorySizeSqrt; x++) {
-        if(itemIdx > items.length - 1) {
-          item = null;
-          itemData = null;
-          asset = Assets.get['items']['empty'];
-        } else {
-          item = items[itemIdx];
-          itemData = item.itemData;
-          asset = Assets.get['items'][itemData.image];
-        }
-
-        ctx.drawImage(asset, x * GRID_SIZE, y * GRID_SIZE, asset.width, asset.height);
-        itemIdx++;
-
-        if(item && itemData && itemData.maxAmount > 1) {
-          ctx.font = '12px "monospace"';
-          ctx.fillText(String(item.amount), x * GRID_SIZE + offsetX, y * GRID_SIZE + offsetY);
-        }
-      }
-    }
-
-    if (items.length === 0) {
-      return Commands.sendEmbed(message, 'Inventory', 'Empty');
-    }
-
-    return message.channel.send(`Your inventory, ${Commands.mention(message.author.id)}`, new Discord.Attachment(canvas.toBuffer()));
+    // return message.author.send(`Your inventory, ${Commands.mention(message.author.id)}`, new Discord.Attachment(inventoryCanvas.toBuffer()));
+    return message.channel.send(`Your inventory, ${Commands.mention(message.author.id)}`, new Discord.Attachment(inventoryCanvas.toBuffer()));
   }
 
   /**
@@ -263,7 +240,7 @@ class Game {
       colonist.setSettlement(name);
 
       return this.manager.updateColonist(colonist.userId).then(() => {
-        return Commands.sendSuccess(message, 'Settlement Created').then(() => this.settlementInfo(name));
+        return Commands.sendSuccess(message, 'Settlement Created').then(() => this.settlementInfo(message, [name]));
       }).catch(e => {
         colonist.setSettlement(null);
 
@@ -300,7 +277,7 @@ class Game {
       return Commands.sendError(message, `No settlement with name \`${name}\``);
     }
 
-    return this.settlementInfo(name);
+    return this.settlementInfo(message, [name]);
   }
 
   /**
@@ -392,6 +369,7 @@ class Game {
     const colonist = this.manager.getColonist(message.author.id);
 
     colonist.setAction(Colonist.actions[action]);
+    this.manager.updateColonist(message.author.id);
 
     return Commands.sendSuccess(message, `Profession: ${Colonist.profession[action]}`);
   }

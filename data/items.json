@@ -10,9 +10,9 @@
     "price": 1,
     "maxAmount": 99
   },
-  "strawberry": {
-    "name": "Strawberry",
-    "image": "strawberry",
+  "berries": {
+    "name": "Berries",
+    "image": "berries",
     "price": 1,
     "maxAmount": 99
   },

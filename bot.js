@@ -81,7 +81,7 @@ Promise.resolve()
   .then(() => load());
 
 function init() {
-  game = new Game(db);
+  game = new Game(db, client);
 
   return Promise.resolve()
     .then(() => TicTacToe.preload())
